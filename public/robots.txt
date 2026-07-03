@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://irumns.com/sitemap-index.xml
+Sitemap: https://www.irumns.com/sitemap.xml

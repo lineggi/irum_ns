@@ -209,3 +209,35 @@ export const products = [
     detailImg: '/images/products/sikaflex-11fc.jpg',
   },
 ];
+
+// ── 통이미지 카탈로그 (제품소개 탭 구조) ─────────────────
+// 카테고리 → 제품 → 통이미지(여러 장이면 세로로 이어붙여 표시)
+export const catalog = [
+  {
+    slug: 'nonslip', name: '논슬립',
+    products: [
+      { name: '논슬립 테이프', images: ['/images/products/nonslip-tape.jpg'] },
+      { name: '세라믹 각 논슬립 62', images: ['/images/products/ceramic-62.jpg'] },
+      { name: '알루미늄 논슬립 AL 60-S', images: ['/images/products/al-60s.jpg'] },
+    ],
+  },
+  {
+    slug: 'finish', name: '마감재',
+    products: [
+      { name: '마감재 (데코트림·프로파일·죠인트·논슬립 외)',
+        images: ['/images/products/finish.jpg', '/images/products/ma02.jpg', '/images/products/ma03.jpg'] },
+    ],
+  },
+  {
+    slug: 'skirting', name: '굽도리',
+    products: [
+      { name: '굽도리 (월베이스·우드·무지)', images: ['/images/products/skirting.jpg'] },
+    ],
+  },
+  {
+    slug: 'etc', name: '기타 부자재',
+    products: [
+      { name: '시카플렉스 11 FC (실리콘 접착제)', images: ['/images/products/sikaflex-11fc.jpg'] },
+    ],
+  },
+];

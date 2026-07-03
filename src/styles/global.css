@@ -51,8 +51,9 @@ a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
 .container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
-.section { padding: clamp(48px, 8vw, 84px) 0; }
-.section-tight { padding: clamp(32px, 5vw, 52px) 0; }
+/* padding-block(세로만) 사용 — .container와 함께 쓸 때 좌우 패딩이 유지되도록 */
+.section { padding-block: clamp(48px, 8vw, 84px); }
+.section-tight { padding-block: clamp(32px, 5vw, 52px); }
 .center { text-align: center; }
 .eyebrow {
   display: inline-block; font-weight: 700; font-size: 0.85rem;
@@ -227,6 +228,23 @@ img[data-zoom] { cursor: zoom-in; }
 /* 제품 상세 이미지(원본 상세페이지 이미지) */
 .detail-img { display: block; width: 100%; max-width: 720px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); margin: 0 auto; }
 
+/* 제품소개 탭 (카테고리 → 제품 → 통이미지) */
+.cat-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 22px; }
+.cat-tab { font: inherit; font-weight: 700; padding: 12px 22px; border-radius: 999px; border: 2px solid var(--line);
+  background: #fff; color: var(--ink-soft); cursor: pointer; min-height: 48px; transition: background .12s, color .12s, border-color .12s; }
+.cat-tab:hover { border-color: var(--brand); color: var(--brand-dark); }
+.cat-tab[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.prod-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.prod-tab { font: inherit; font-weight: 600; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: #fff; color: var(--ink-soft); cursor: pointer; }
+.prod-tab:hover { border-color: var(--brand); color: var(--brand-dark); }
+.prod-tab[aria-selected="true"] { background: var(--green-50); border-color: var(--brand); color: var(--brand-dark); }
+.tong-title { text-align: center; font-size: 1.15rem; margin-bottom: 16px; }
+.tong-wrap { max-width: 760px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: #fff; }
+.tong { display: block; width: 100%; }               /* 여러 장이면 세로로 이어붙여 통이미지처럼 */
+.tong-cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
+@media (max-width: 640px) { .tong-cta .btn { width: 100%; } }
+
 /* 카드 썸네일 (긴 상세 이미지의 상단을 잘라 미리보기) */
 .thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: top center;
   border-radius: var(--radius); margin-bottom: 14px; background: #f3f4f0; display: block; }
@@ -241,9 +259,9 @@ img[data-zoom] { cursor: zoom-in; }
 
 /* ── 모바일 미세조정 (≤640px) ───────────────────────── */
 @media (max-width: 640px) {
-  .section { padding: 40px 0; }
-  .section-tight { padding: 26px 0; }
-  .hero .section { padding: 28px 0 36px; }
+  .section { padding-block: 40px; }
+  .section-tight { padding-block: 26px; }
+  .hero .section { padding-block: 24px 36px; }
   h1 { font-size: clamp(1.7rem, 8vw, 2.2rem); }
   /* 히어로/CTA 버튼 전체 폭 + 세로 정렬로 탭 쉽게 */
   .hero-cta { flex-direction: column; align-items: stretch; }

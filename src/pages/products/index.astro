@@ -1,63 +1,78 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { site } from '../../data/site.js';
-import { categories, products } from '../../data/products.js';
+import { catalog } from '../../data/products.js';
 ---
 
-<BaseLayout title="제품소개" active="/products/" description="논슬립 테이프·세라믹 각 논슬립·알루미늄 논슬립, 마감재, 굽도리, 접착 부자재까지. 용도에 맞는 미끄럼 방지 제품을 찾아보세요.">
+<BaseLayout title="제품소개" active="/products/" description="논슬립(테이프·세라믹·알루미늄), 마감재, 굽도리, 접착 부자재. 카테고리를 선택하면 제품 상세 이미지를 한눈에 볼 수 있습니다.">
   <section class="page-head">
     <div class="container">
       <div class="breadcrumb"><a href="/">홈</a> · 제품소개</div>
       <h1>제품소개</h1>
-      <p class="lead">용도에 맞게 골라보세요. 구매는 상단 <strong>구매하기</strong> 버튼(스마트스토어)에서 진행됩니다.</p>
-      <div class="swatches" style="margin-top:14px">
-        {categories.map((c) => (<a class="tag" href={`#${c.slug}`}>{c.emoji} {c.name}</a>))}
-      </div>
+      <p class="lead">보고 싶은 제품을 선택하세요. 구매는 상단 <strong>구매하기</strong>(스마트스토어)에서 진행됩니다.</p>
     </div>
   </section>
 
-  {categories.map((c, i) => (
-    <section class="section" id={c.slug} style={i % 2 === 1 ? 'background:var(--green-50)' : ''}>
-      <div class="container">
-        <h2>{c.emoji} {c.name}</h2>
-        <p class="lead" style="margin-bottom:24px">{c.desc}</p>
-        <div class="grid grid-3">
-          {products.filter((p) => p.category === c.slug).map((p) => (
-            <a class="card" href={`/products/${p.slug}/`}>
-              <img class="thumb" src={p.img} alt={p.name} loading="lazy"
-                onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'제품 사진'}))" />
-              <h3>{p.name}</h3>
-              <p style="margin:0 0 10px">{p.tagline}</p>
-              {p.specs?.[0] && (<p style="margin:0 0 10px;font-weight:700;color:var(--ink)">{p.specs[0].label}: {p.specs[0].value}</p>)}
-              {p.colors && (
-                <div class="swatches">
-                  {p.colors.slice(0, 7).map((col) => (
-                    col.hex ? <span class="swatch"><span class="dotc" style={`background:${col.hex}`}></span></span>
-                    : col.stripe ? <span class="swatch"><span class="dotc stripe"></span></span>
-                    : <span class="swatch code">{col.name}</span>
-                  ))}
-                </div>
-              )}
-              <span class="tag" style="margin-top:10px">자세히 보기 →</span>
-            </a>
+  <section class="section">
+    <div class="container">
+      <!-- 1단계: 카테고리 탭 -->
+      <div class="cat-tabs" role="tablist" aria-label="제품 카테고리">
+        {catalog.map((c, ci) => (
+          <button class="cat-tab" type="button" data-cat={c.slug} role="tab" aria-selected={ci === 0 ? 'true' : 'false'}>{c.name}</button>
+        ))}
+      </div>
+
+      {catalog.map((c, ci) => (
+        <div class="cat-panel" data-cat={c.slug} hidden={ci !== 0}>
+          {/* 2단계: 제품 탭 (제품이 2개 이상일 때만) */}
+          {c.products.length > 1 && (
+            <div class="prod-tabs" role="tablist" aria-label={`${c.name} 제품`}>
+              {c.products.map((p, pi) => (
+                <button class="prod-tab" type="button" data-prod={String(pi)} role="tab" aria-selected={pi === 0 ? 'true' : 'false'}>{p.name}</button>
+              ))}
+            </div>
+          )}
+
+          {c.products.map((p, pi) => (
+            <div class="prod-panel" data-prod={String(pi)} hidden={pi !== 0}>
+              <h2 class="tong-title">{p.name}</h2>
+              <div class="tong-wrap">
+                {p.images.map((src) => (
+                  <img class="tong" src={src} alt={`${p.name} 상세 이미지`} data-zoom loading="lazy" />
+                ))}
+              </div>
+              <div class="tong-cta">
+                <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 스토어에서 구매하기</a>
+                <a class="btn btn-ghost" href="/contact/">💬 규격·수량 문의</a>
+              </div>
+            </div>
           ))}
         </div>
-      </div>
-    </section>
-  ))}
-
-  <section class="section-tight">
-    <div class="container">
-      <div class="banner">
-        <div>
-          <h2>규격·수량이 헷갈리시나요?</h2>
-          <p>필요한 길이나 계단 수를 알려주시면 딱 맞는 제품과 수량을 안내해 드려요.</p>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하기</a>
-          <a class="btn btn-ghost" href="/contact/">💬 문의하기</a>
-        </div>
-      </div>
+      ))}
     </div>
   </section>
+
+  <script is:inline>
+    (function () {
+      var catTabs = Array.prototype.slice.call(document.querySelectorAll('.cat-tab'));
+      function showProd(panel, idx) {
+        panel.querySelectorAll('.prod-panel').forEach(function (pp) { pp.hidden = pp.dataset.prod !== idx; });
+        panel.querySelectorAll('.prod-tab').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.prod === idx ? 'true' : 'false'); });
+      }
+      function showCat(slug) {
+        document.querySelectorAll('.cat-panel').forEach(function (p) { p.hidden = p.dataset.cat !== slug; });
+        catTabs.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.cat === slug ? 'true' : 'false'); });
+        var panel = document.querySelector('.cat-panel[data-cat="' + slug + '"]');
+        if (panel) { var first = panel.querySelector('.prod-tab'); showProd(panel, first ? first.dataset.prod : '0'); }
+      }
+      catTabs.forEach(function (b) {
+        b.addEventListener('click', function () { showCat(b.dataset.cat); history.replaceState(null, '', '#' + b.dataset.cat); });
+      });
+      document.querySelectorAll('.prod-tab').forEach(function (b) {
+        b.addEventListener('click', function () { showProd(b.closest('.cat-panel'), b.dataset.prod); });
+      });
+      var initial = (location.hash || '').replace('#', '');
+      if (catTabs.some(function (b) { return b.dataset.cat === initial; })) showCat(initial);
+    })();
+  </script>
 </BaseLayout>

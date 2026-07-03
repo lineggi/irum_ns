@@ -18,7 +18,7 @@ import { cases } from '../../data/content.js';
       <div class="gallery">
         {cases.map((c) => (
           <figure>
-            <img src={c.img} alt={c.title} loading="lazy" />
+            <img src={c.img} alt={c.title} data-zoom data-full={c.img} loading="lazy" />
             <figcaption>{c.title}<small>{c.note}</small></figcaption>
           </figure>
         ))}

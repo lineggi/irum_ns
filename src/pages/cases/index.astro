@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site.js';
+import { cases } from '../../data/content.js';
+---
+
+<BaseLayout title="시공사례" active="/cases/" description="아파트 계단, 상가 경사로, 주택 현관 등 실제 논슬립 시공 사례를 확인하세요.">
+  <section class="page-head">
+    <div class="container">
+      <div class="breadcrumb">홈 · 시공사례</div>
+      <h1>시공사례</h1>
+      <p class="lead">실제로 이렇게 바뀌었어요. 우리 집·가게에도 적용해 보세요.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-3">
+        {cases.map((c) => (
+          <div class="card">
+            <div class="ph">현장 사진 (전/후)</div>
+            <h3>{c.title}</h3>
+            <p style="margin:0 0 6px"><strong>{c.place}</strong> · 사용 제품: {c.product}</p>
+            <p style="margin:0">{c.note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight center">
+    <div class="container">
+      <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 우리 집에도 적용하기</a>
+    </div>
+  </section>
+</BaseLayout>

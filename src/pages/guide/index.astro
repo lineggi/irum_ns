@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site.js';
+import { guides } from '../../data/content.js';
+---
+
+<BaseLayout title="시공가이드" active="/guide/" description="계단·욕실 논슬립 셀프 시공 방법을 단계별로. 초보자도 혼자 따라 할 수 있습니다.">
+  <section class="page-head">
+    <div class="container">
+      <div class="breadcrumb">홈 · 시공가이드</div>
+      <h1>혼자 하는 시공 가이드 🔧</h1>
+      <p class="lead">전문가가 아니어도 괜찮아요. 준비물부터 마감까지, 사진과 함께 따라 하면 됩니다.</p>
+    </div>
+  </section>
+
+  {guides.map((g, i) => (
+    <section class="section" id={g.slug} style={i % 2 === 1 ? 'background:var(--green-50)' : ''}>
+      <div class="container">
+        <span class="tag">⏱ 약 {g.minutes}분</span>
+        <span class="tag">{g.level}</span>
+        <h2>{g.title}</h2>
+        <p class="lead" style="margin-bottom:22px">{g.summary}</p>
+
+        <div class="grid grid-2" style="align-items:start">
+          <div class="ph" style="aspect-ratio:4/3">시공 과정 사진/영상 자리</div>
+          <div class="steps">
+            {g.steps.map((s) => (
+              <div class="step">
+                <div class="num"></div>
+                <div>
+                  <h3 style="margin:0 0 2px">{s.t}</h3>
+                  <p style="margin:0">{s.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {g.faq?.length > 0 && (
+          <div style="margin-top:26px">
+            <h3>자주 묻는 질문</h3>
+            {g.faq.map((f) => (
+              <details style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px">
+                <summary style="font-weight:700;cursor:pointer">{f.q}</summary>
+                <p style="margin:10px 0 0">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="section-tight center">
+    <div class="container">
+      <h2>필요한 제품이 준비되셨나요?</h2>
+      <p class="lead" style="margin:0 auto 22px">가이드에 나온 제품은 스토어에서 바로 구매할 수 있어요.</p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하러 가기</a>
+        <a class="btn btn-ghost" href="/products/">제품 보기</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

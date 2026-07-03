@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site.js';
+import { categories } from '../data/products.js';
+import { cases, guides } from '../data/content.js';
+---
+
+<BaseLayout active="/">
+  <!-- 히어로 -->
+  <section class="hero">
+    <div class="container section hero-inner">
+      <div>
+        <span class="eyebrow">개인 구매자를 위한 논슬립</span>
+        <h1>미끄럼 걱정 없는 우리 집,<br />직접 만들어요</h1>
+        <p class="lead">계단·현관·경사로 미끄럼 방지 논슬립을 저렴하게. 혼자서도 쉽게 시공할 수 있도록 시공 방법까지 알려드려요.</p>
+        <div class="hero-cta">
+          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하러 가기</a>
+          <a class="btn btn-ghost" href="/guide/">🔧 혼자 시공하는 법</a>
+        </div>
+        <div class="hero-badges">
+          <span>✅ 초보자도 OK</span>
+          <span>💸 합리적인 가격</span>
+          <span>📦 스마트스토어 안전거래</span>
+        </div>
+      </div>
+      <div class="ph" style="aspect-ratio:1/1">대표 이미지 자리<br />(계단 논슬립 시공 사진)</div>
+    </div>
+  </section>
+
+  <!-- 제품 카테고리 -->
+  <section class="section">
+    <div class="container">
+      <div class="center">
+        <span class="eyebrow">제품소개</span>
+        <h2>어떤 제품이 필요하세요?</h2>
+        <p class="lead" style="margin:0 auto 28px">용도에 맞게 골라보세요. 잘 모르겠다면 문의로 물어보셔도 좋아요.</p>
+      </div>
+      <div class="grid grid-4">
+        {categories.map((c) => (
+          <a class="card center" href={`/products/#${c.slug}`}>
+            <div class="emoji">{c.emoji}</div>
+            <h3>{c.name}</h3>
+            <p style="margin:0">{c.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 셀프 시공 배너 -->
+  <section class="section-tight">
+    <div class="container">
+      <div class="banner">
+        <div>
+          <h2>혼자서도 충분히 할 수 있어요 🙌</h2>
+          <p>공구만 있으면 30분이면 끝! 사진과 함께 따라 하는 단계별 시공 가이드를 준비했어요.</p>
+        </div>
+        <a class="btn btn-ghost" href="/guide/">시공 가이드 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 시공 가이드 미리보기 -->
+  <section class="section">
+    <div class="container">
+      <div class="center">
+        <span class="eyebrow">시공가이드</span>
+        <h2>따라 하기 쉬운 시공법</h2>
+      </div>
+      <div class="grid grid-3">
+        {guides.map((g) => (
+          <a class="card" href={`/guide/#${g.slug}`}>
+            <div class="ph">시공 사진</div>
+            <span class="tag">⏱ 약 {g.minutes}분</span>
+            <span class="tag">{g.level}</span>
+            <h3>{g.title}</h3>
+            <p style="margin:0">{g.summary}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 시공 사례 -->
+  <section class="section" style="background:var(--green-50)">
+    <div class="container">
+      <div class="center">
+        <span class="eyebrow">시공사례</span>
+        <h2>이렇게 바뀌었어요</h2>
+      </div>
+      <div class="grid grid-3">
+        {cases.map((c) => (
+          <div class="card">
+            <div class="ph">현장 사진</div>
+            <h3>{c.title}</h3>
+            <p style="margin:0 0 6px"><strong>{c.place}</strong> · {c.product}</p>
+            <p style="margin:0">{c.note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 문의 CTA -->
+  <section class="section center">
+    <div class="container">
+      <h2>궁금한 점이 있으신가요?</h2>
+      <p class="lead" style="margin:0 auto 24px">제품 선택, 필요 수량, 시공 방법 무엇이든 메시지로 편하게 물어보세요.</p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn btn-primary" href="/contact/">💬 문의하기</a>
+        <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하러 가기</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

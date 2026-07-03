@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site.js';
+---
+
+<BaseLayout title="회사소개" active="/about/" description="이룸 논슬립 회사소개. 미끄럼 방지 제품을 합리적인 가격에 공급합니다.">
+  <section class="page-head">
+    <div class="container">
+      <div class="breadcrumb">홈 · 회사소개</div>
+      <h1>회사소개</h1>
+      <p class="lead">미끄럼 사고 없는 안전한 공간을 누구나 쉽게 만들 수 있도록 돕습니다.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid grid-2" style="align-items:center">
+      <div class="ph" style="aspect-ratio:4/3">회사/제품 이미지</div>
+      <div>
+        <h2>이룸 논슬립은요</h2>
+        <p>계단·현관·경사로·욕실의 미끄럼 사고를 줄이는 논슬립과 마감재, 굽도리, 시공 부자재를 공급합니다. 전문 시공업체뿐 아니라 <strong>개인 구매자</strong>도 부담 없이 구매하고 직접 시공할 수 있도록, 합리적인 가격과 쉬운 시공 안내에 집중합니다.</p>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card center"><div class="emoji">💸</div><h3>합리적 가격</h3><p style="margin:0">개인도 부담 없이</p></div>
+          <div class="card center"><div class="emoji">🔧</div><h3>쉬운 시공</h3><p style="margin:0">가이드 제공</p></div>
+          <div class="card center"><div class="emoji">🛟</div><h3>안전 우선</h3><p style="margin:0">검증된 제품</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight center">
+    <div class="container">
+      <a class="btn btn-primary" href="/contact/">💬 문의하기</a>
+      <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener" style="margin-left:8px">🛒 구매하기</a>
+    </div>
+  </section>
+</BaseLayout>

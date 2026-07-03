@@ -24,8 +24,8 @@ const related = products.filter((p) => p.category === product.category && p.slug
 
   <section class="section">
     <div class="container grid grid-2" style="align-items:start">
-      <!-- 이미지: 실제 상세 이미지로 교체 (public/images/products/) -->
-      <div class="ph" style="aspect-ratio:4/3">제품 이미지<br /><small>{product.img}</small></div>
+      <img class="thumb" style="aspect-ratio:1/1" src={product.img} alt={product.name} loading="eager"
+        onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'제품 사진'}))" />
 
       <div>
         {product.features?.length > 0 && (
@@ -80,6 +80,16 @@ const related = products.filter((p) => p.category === product.category && p.slug
     </div>
   </section>
 
+  {product.detailImg && (
+    <section class="section-tight">
+      <div class="container center">
+        <h2>제품 상세 정보</h2>
+        <img class="detail-img" src={product.detailImg} alt={`${product.name} 상세 정보`} loading="lazy"
+          onerror="this.closest('section').remove()" />
+      </div>
+    </section>
+  )}
+
   {related.length > 0 && (
     <section class="section" style="background:var(--green-50)">
       <div class="container">
@@ -87,7 +97,8 @@ const related = products.filter((p) => p.category === product.category && p.slug
         <div class="grid grid-3">
           {related.map((p) => (
             <a class="card" href={`/products/${p.slug}/`}>
-              <div class="ph">제품 사진</div>
+              <img class="thumb" src={p.img} alt={p.name} loading="lazy"
+                onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'제품 사진'}))" />
               <h3>{p.name}</h3>
               <p style="margin:0">{p.tagline}</p>
             </a>

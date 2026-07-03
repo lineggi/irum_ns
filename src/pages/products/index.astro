@@ -24,7 +24,8 @@ import { categories, products } from '../../data/products.js';
         <div class="grid grid-3">
           {products.filter((p) => p.category === c.slug).map((p) => (
             <a class="card" href={`/products/${p.slug}/`}>
-              <div class="ph">제품 사진</div>
+              <img class="thumb" src={p.img} alt={p.name} loading="lazy"
+                onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'제품 사진'}))" />
               <h3>{p.name}</h3>
               <p style="margin:0 0 10px">{p.tagline}</p>
               {p.specs?.[0] && (<p style="margin:0 0 10px;font-weight:700;color:var(--ink)">{p.specs[0].label}: {p.specs[0].value}</p>)}

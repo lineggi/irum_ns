@@ -37,8 +37,13 @@ export const guides = [
   },
 ];
 
-export const cases = [
-  { slug: 'apt-stair', title: '아파트 공용계단 미끄럼 개선', place: '아파트 계단', product: '세라믹 각 논슬립 62', note: '입주민 낙상 민원 해결.', img: '' },
-  { slug: 'store-ramp', title: '상가 경사로 안전 시공', place: '상가 경사로', product: '알루미늄 논슬립 AL 60-S', note: '비 오는 날도 안심.', img: '' },
-  { slug: 'home-entrance', title: '단독주택 현관 셀프 시공', place: '주택 현관', product: '세라믹 논슬립 테이프', note: '집주인이 직접 30분 시공.', img: '' },
-];
+// 실제 시공 현장 사진 (public/images/cases/). 필요 시 title/note를 현장에 맞게 수정하세요.
+export const cases = Array.from({ length: 11 }, (_, i) => {
+  const n = String(i + 1).padStart(3, '0');
+  return {
+    slug: `case${n}`,
+    title: '논슬립 시공 현장',
+    note: '계단·경사로 미끄럼 방지 시공',
+    img: `/images/cases/case${n}.jpg`,
+  };
+});

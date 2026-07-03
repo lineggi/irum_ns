@@ -15,14 +15,12 @@ import { cases } from '../../data/content.js';
 
   <section class="section">
     <div class="container">
-      <div class="grid grid-3">
+      <div class="gallery">
         {cases.map((c) => (
-          <div class="card">
-            <div class="ph">현장 사진 (전/후)</div>
-            <h3>{c.title}</h3>
-            <p style="margin:0 0 6px"><strong>{c.place}</strong> · 사용 제품: {c.product}</p>
-            <p style="margin:0">{c.note}</p>
-          </div>
+          <figure>
+            <img src={c.img} alt={c.title} loading="lazy" />
+            <figcaption>{c.title}<small>{c.note}</small></figcaption>
+          </figure>
         ))}
       </div>
     </div>

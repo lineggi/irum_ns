@@ -15,7 +15,9 @@ const desc = description ?? site.description;
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <meta name="theme-color" content="#16a34a" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -43,7 +45,7 @@ const desc = description ?? site.description;
   <body>
     <header class="site-header">
       <div class="container bar">
-        <a class="brand" href="/"><img class="brand-mark" src="/favicon.svg" alt="" width="32" height="32" />{site.name}</a>
+        <a class="brand" href="/"><img class="brand-mark" src="/images/logo-mark.png" alt="" width="34" height="34" />{site.name}</a>
         <nav class="gnb" aria-label="주요 메뉴">
           {nav.map((item) => (
             <a href={item.href} aria-current={active === item.href ? 'page' : undefined}>{item.label}</a>

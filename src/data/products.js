@@ -40,7 +40,8 @@ export const products = [
       { name: '안전사선', stripe: true },
     ],
     applications: ['실내외 계단', '건물 출입구', '경사로', '가정 내 미끄럼 구간'],
-    img: '/images/products/ceramic-tape.jpg',
+    img: '/images/products/nonslip-tape.jpg',
+    detailImg: '/images/products/nonslip-tape.jpg',
   },
   {
     slug: 'ceramic-62',
@@ -72,6 +73,7 @@ export const products = [
     ],
     note: '에폭시 시공 시 뒷면 양면테이프 부착이 간편 (테이프 부착 별도 1M 500원)',
     img: '/images/products/ceramic-62.jpg',
+    detailImg: '/images/products/ceramic-62.jpg',
   },
   {
     slug: 'al-60s',
@@ -95,6 +97,7 @@ export const products = [
     ],
     applications: ['호텔·빌딩·아파트', '관공서·학교·공공시설 등 건물 실내외 계단'],
     img: '/images/products/al-60s.jpg',
+    detailImg: '/images/products/al-60s.jpg',
   },
 
   // ── 마감재 ─────────────────────────────
@@ -110,7 +113,8 @@ export const products = [
       { label: '재질', value: '알루미늄(AL)' },
     ],
     applications: ['타일 마감', '바닥 재료 분리', '끝단 마감'],
-    img: '/images/products/deco-trim.jpg',
+    img: '/images/products/finish.jpg',
+    detailImg: '/images/products/finish.jpg',
   },
   {
     slug: 'profile',
@@ -123,7 +127,8 @@ export const products = [
       { label: '재질', value: '알루미늄(AL)' },
     ],
     applications: ['타일 마감', '바닥 재료 분리', '끝단 마감'],
-    img: '/images/products/profile.jpg',
+    img: '/images/products/finish.jpg',
+    detailImg: '/images/products/finish.jpg',
   },
 
   // ── 굽도리 ─────────────────────────────
@@ -140,7 +145,8 @@ export const products = [
     ],
     colors: [{ name: '102' }, { name: '103' }, { name: '106' }, { name: '107' }, { name: '108' }, { name: '109' }],
     applications: ['건물 실내외', '공공시설'],
-    img: '/images/products/wall-base.jpg',
+    img: '/images/products/skirting.jpg',
+    detailImg: '/images/products/skirting.jpg',
   },
   {
     slug: 'wood-skirting',
@@ -154,7 +160,8 @@ export const products = [
     ],
     colors: [{ name: 'TL7501~TL7511 등 다양한 우드 컬러' }],
     applications: ['건물 실내', '병원 복도'],
-    img: '/images/products/wood-skirting.jpg',
+    img: '/images/products/skirting.jpg',
+    detailImg: '/images/products/skirting.jpg',
   },
   {
     slug: 'plain-skirting',
@@ -168,7 +175,8 @@ export const products = [
     ],
     colors: [{ name: '106' }, { name: '108' }, { name: '109' }],
     applications: ['건물 실내', '병원 복도'],
-    img: '/images/products/plain-skirting.jpg',
+    img: '/images/products/skirting.jpg',
+    detailImg: '/images/products/skirting.jpg',
   },
 
   // ── 기타 부자재 ────────────────────────
@@ -198,5 +206,6 @@ export const products = [
     ],
     applications: ['논슬립 시공 접착제', '나무·금속 등 공업용 접착 및 씰링'],
     img: '/images/products/sikaflex-11fc.jpg',
+    detailImg: '/images/products/sikaflex-11fc.jpg',
   },
 ];

@@ -27,8 +27,8 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
     <meta property="og:description" content={desc} />
     <meta property="og:locale" content="ko_KR" />
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-    {ogImageUrl && <meta property="og:image:width" content="1456" />}
-    {ogImageUrl && <meta property="og:image:height" content="1092" />}
+    {ogImageUrl && <meta property="og:image:width" content="1448" />}
+    {ogImageUrl && <meta property="og:image:height" content="1086" />}
     <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 

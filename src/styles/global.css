@@ -45,7 +45,10 @@ body {
   overflow-wrap: break-word;
 }
 
-h1, h2, h3 { line-height: 1.25; letter-spacing: -0.02em; margin: 0 0 0.4em; }
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.02em; margin: 0 0 0.4em; text-wrap: balance; }
+/* 마지막 줄에 한 단어만 남는(고아) 현상 방지 */
+p, .lead, figcaption, .step p, .check-list li { text-wrap: pretty; }
+.lead, .eyebrow, .tong-title, .breadcrumb { text-wrap: balance; }
 h1 { font-size: clamp(1.8rem, 5vw, 2.9rem); font-weight: 800; }
 h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 700; }
 h3 { font-size: 1.15rem; font-weight: 700; }

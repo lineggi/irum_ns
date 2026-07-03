@@ -40,6 +40,9 @@ body {
   background: var(--bg);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  /* 한글이 글자 단위로 끊기지 않고 어절(띄어쓰기) 단위로 줄바꿈되게 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 h1, h2, h3 { line-height: 1.25; letter-spacing: -0.02em; margin: 0 0 0.4em; }

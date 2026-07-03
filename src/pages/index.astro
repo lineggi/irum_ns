@@ -70,7 +70,10 @@ import { cases, guides } from '../data/content.js';
       <div class="grid grid-3">
         {guides.map((g) => (
           <a class="card" href={`/guide/#${g.slug}`}>
-            <div class="ph">시공 사진</div>
+            {g.img
+              ? <img class="thumb" src={g.img} alt={g.title} loading="lazy"
+                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'시공 사진'}))" />
+              : <div class="ph">시공 사진</div>}
             <span class="tag">⏱ 약 {g.minutes}분</span>
             <span class="tag">{g.level}</span>
             <h3>{g.title}</h3>

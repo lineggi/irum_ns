@@ -6,6 +6,8 @@ export const site = {
     '계단·현관·경사로 미끄럼 방지 논슬립을 저렴하게. 개인도 혼자 시공할 수 있도록 쉬운 시공 가이드까지 알려드립니다.',
   // 구매는 네이버 스마트스토어에서 (GNB "구매하기"에만 연결)
   storeUrl: 'https://smartstore.naver.com/anjeon_nonslip',
+  // 링크 공유 시 나오는 대표 이미지(OG). 파일을 public 경로에 올리면 적용됨.
+  ogImage: '/images/guide/stair-tape.jpg',
   // 문의는 메시지 채널로
   channels: {
     kakao: 'https://pf.kakao.com/_lxmsIG', // 카카오톡 채널 (문의하기)

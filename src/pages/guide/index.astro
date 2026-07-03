@@ -22,7 +22,10 @@ import { guides } from '../../data/content.js';
         <p class="lead" style="margin-bottom:22px">{g.summary}</p>
 
         <div class="grid grid-2" style="align-items:start">
-          <div class="ph" style="aspect-ratio:4/3">시공 과정 사진/영상 자리</div>
+          {g.img
+            ? <img class="thumb" style="aspect-ratio:4/3" src={g.img} alt={g.title} loading="lazy"
+                onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'시공 사진'}))" />
+            : <div class="ph" style="aspect-ratio:4/3">시공 과정 사진/영상 자리</div>}
           <div class="steps">
             {g.steps.map((s) => (
               <div class="step">

@@ -217,8 +217,8 @@ export const catalog = [
     slug: 'nonslip', name: '논슬립',
     products: [
       { name: '논슬립 테이프', images: ['/images/products/nonslip-tape.jpg'] },
-      { name: '세라믹 각 논슬립 62', images: ['/images/products/ceramic-62.jpg'] },
-      { name: '알루미늄 논슬립 AL 60-S', images: ['/images/products/al-60s.jpg'] },
+      { name: '세라믹 각 논슬립', images: ['/images/products/ceramic-62.jpg', '/images/products/nsCeramic02.jpg'] },
+      { name: '알루미늄 논슬립', images: ['/images/products/al-60s.jpg', '/images/products/nsAL601-1.jpg', '/images/products/nsAL507.jpg'] },
     ],
   },
   {

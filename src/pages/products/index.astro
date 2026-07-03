@@ -71,8 +71,13 @@ import { catalog } from '../../data/products.js';
       document.querySelectorAll('.prod-tab').forEach(function (b) {
         b.addEventListener('click', function () { showProd(b.closest('.cat-panel'), b.dataset.prod); });
       });
-      var initial = (location.hash || '').replace('#', '');
-      if (catTabs.some(function (b) { return b.dataset.cat === initial; })) showCat(initial);
+      function applyHash() {
+        var slug = (location.hash || '').replace('#', '');
+        if (catTabs.some(function (b) { return b.dataset.cat === slug; })) showCat(slug);
+      }
+      applyHash();
+      // 같은 페이지에서 해시만 바뀌어도(카드 링크 등) 탭이 열리도록
+      window.addEventListener('hashchange', applyHash);
     })();
   </script>
 </BaseLayout>

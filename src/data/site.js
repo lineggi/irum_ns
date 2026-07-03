@@ -10,15 +10,16 @@ export const site = {
   channels: {
     kakao: 'https://pf.kakao.com/_lxmsIG', // 카카오톡 채널 (문의하기)
     naverTalk: '', // 네이버 톡톡 채널 URL (있으면 입력)
-    tel: '000-0000-0000', // 대표 전화번호로 교체
+    tel: '010-9845-6890', // 대표 번호
+    email: 'irum_ns@naver.com', // 이메일
   },
-  // 사업자 정보 (전자상거래 표시 의무) — 실제 값으로 교체
+  // 사업자 정보 (전자상거래 표시 의무)
   business: {
-    company: '이룸',
-    owner: '대표자명',
-    bizNo: '000-00-00000',
-    mailOrderNo: '제0000-지역0000호',
-    address: '주소를 입력하세요',
+    company: '이룸엔에스',
+    owner: '이세리',
+    bizNo: '211-66-61942',
+    mailOrderNo: '', // 통신판매업 신고번호 (있으면 입력)
+    address: '경기도 남양주시 오남읍 팔현리 288-1',
   },
 };
 

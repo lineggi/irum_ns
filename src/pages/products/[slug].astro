@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site.js';
+import { categories, products } from '../../data/products.js';
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
+}
+
+const { product } = Astro.props;
+const cat = categories.find((c) => c.slug === product.category);
+const related = products.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3);
+---
+
+<BaseLayout title={product.name} active="/products/" description={`${product.name} — ${product.tagline}`}>
+  <section class="page-head">
+    <div class="container">
+      <div class="breadcrumb"><a href="/">홈</a> · <a href="/products/">제품소개</a> · <a href={`/products/#${cat.slug}`}>{cat.name}</a></div>
+      <span class="tag">{cat.emoji} {cat.name}</span>
+      <h1>{product.name}</h1>
+      <p class="lead">{product.tagline}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid grid-2" style="align-items:start">
+      <!-- 이미지: 실제 상세 이미지로 교체 (public/images/products/) -->
+      <div class="ph" style="aspect-ratio:4/3">제품 이미지<br /><small>{product.img}</small></div>
+
+      <div>
+        {product.features?.length > 0 && (
+          <>
+            <h3>제품 특징</h3>
+            <ul class="check-list" style="margin-bottom:22px">
+              {product.features.map((f) => (<li>{f}</li>))}
+            </ul>
+          </>
+        )}
+
+        {product.specs?.length > 0 && (
+          <>
+            <h3>규격 상세</h3>
+            <table class="spec-table" style="margin-bottom:22px">
+              <tbody>
+                {product.specs.map((s) => (<tr><th>{s.label}</th><td>{s.value}</td></tr>))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {product.colors && (
+          <>
+            <h3>색상</h3>
+            <div class="swatches" style="margin-bottom:22px">
+              {product.colors.map((col) => (
+                col.hex ? <span class="swatch"><span class="dotc" style={`background:${col.hex}`}></span>{col.name}</span>
+                : col.stripe ? <span class="swatch"><span class="dotc stripe"></span>{col.name}</span>
+                : <span class="swatch code">{col.name}</span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {product.applications && (
+          <>
+            <h3>적용처</h3>
+            <ul class="check-list" style="margin-bottom:22px">
+              {product.applications.map((a) => (<li>{a}</li>))}
+            </ul>
+          </>
+        )}
+
+        {product.note && (<p class="note-box">※ {product.note}</p>)}
+
+        <div class="hero-cta" style="margin-top:22px">
+          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 스토어에서 구매하기</a>
+          <a class="btn btn-ghost" href="/contact/">💬 규격·수량 문의</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section" style="background:var(--green-50)">
+      <div class="container">
+        <h2>같은 카테고리 제품</h2>
+        <div class="grid grid-3">
+          {related.map((p) => (
+            <a class="card" href={`/products/${p.slug}/`}>
+              <div class="ph">제품 사진</div>
+              <h3>{p.name}</h3>
+              <p style="margin:0">{p.tagline}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

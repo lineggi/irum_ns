@@ -43,7 +43,7 @@ const desc = description ?? site.description;
   <body>
     <header class="site-header">
       <div class="container bar">
-        <a class="brand" href="/"><span class="dot"></span>{site.name}</a>
+        <a class="brand" href="/"><img class="brand-mark" src="/favicon.svg" alt="" width="32" height="32" />{site.name}</a>
         <nav class="gnb" aria-label="주요 메뉴">
           {nav.map((item) => (
             <a href={item.href} aria-current={active === item.href ? 'page' : undefined}>{item.label}</a>
@@ -73,8 +73,8 @@ const desc = description ?? site.description;
           </div>
           <div>
             <h4>문의</h4>
-            <p style="margin:0"><a href={site.channels.naverTalk} target="_blank" rel="noopener">네이버 톡톡</a></p>
-            <p style="margin:0"><a href={site.channels.kakao} target="_blank" rel="noopener">카카오톡 채널</a></p>
+            <p style="margin:0"><a href={site.channels.kakao} target="_blank" rel="noopener">카카오톡 문의</a></p>
+            {site.channels.naverTalk && (<p style="margin:0"><a href={site.channels.naverTalk} target="_blank" rel="noopener">네이버 톡톡</a></p>)}
             <p style="margin:0"><a href={`tel:${site.channels.tel}`}>전화 {site.channels.tel}</a></p>
           </div>
         </div>
@@ -89,7 +89,7 @@ const desc = description ?? site.description;
     <!-- 모바일 하단 고정 액션바 -->
     <nav class="mobile-bar" aria-label="빠른 실행">
       <a href={`tel:${site.channels.tel}`}><span class="ico">📞</span>전화</a>
-      <a href={site.channels.naverTalk} target="_blank" rel="noopener"><span class="ico">💬</span>문의</a>
+      <a href={site.channels.kakao} target="_blank" rel="noopener"><span class="ico">💬</span>문의</a>
       <a class="buy" href={site.storeUrl} target="_blank" rel="noopener"><span class="ico">🛒</span>구매하기</a>
     </nav>
   </body>

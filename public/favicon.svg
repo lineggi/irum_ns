@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#16a34a"/>
-  <path d="M14 40h36M14 40l6-18M50 40l-6-18M24 22h16" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="32" cy="31" r="3.2" fill="#f97316"/>
+  <!-- 이룸NS 로고 모티프: 원형 링 + 올라가는 계단(아래 회색, 위 노란색) -->
+  <circle cx="32" cy="32" r="26" fill="#33373b" stroke="#ffffff" stroke-width="3" />
+  <g stroke="#2b2f33" stroke-width="0.8">
+    <rect x="14" y="42" width="30" height="6" rx="1.5" fill="#8b9097" />
+    <rect x="20" y="36" width="24" height="6" rx="1.5" fill="#b9bdc3" />
+    <rect x="25" y="30" width="19" height="6" rx="1.5" fill="#f4c400" />
+    <rect x="30" y="24" width="15" height="6" rx="1.5" fill="#f8cf1c" />
+    <rect x="35" y="18" width="11" height="6" rx="1.5" fill="#ffd93b" />
+  </g>
 </svg>

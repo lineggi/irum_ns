@@ -4,41 +4,53 @@ import { site } from '../../data/site.js';
 import { categories, products } from '../../data/products.js';
 ---
 
-<BaseLayout title="제품소개" active="/products/" description="논슬립·마감재·굽도리·기타 부자재 제품 안내. 용도에 맞는 미끄럼 방지 제품을 찾아보세요.">
+<BaseLayout title="제품소개" active="/products/" description="논슬립 테이프·세라믹 각 논슬립·알루미늄 논슬립, 마감재, 굽도리, 접착 부자재까지. 용도에 맞는 미끄럼 방지 제품을 찾아보세요.">
   <section class="page-head">
     <div class="container">
-      <div class="breadcrumb">홈 · 제품소개</div>
+      <div class="breadcrumb"><a href="/">홈</a> · 제품소개</div>
       <h1>제품소개</h1>
       <p class="lead">용도에 맞게 골라보세요. 구매는 상단 <strong>구매하기</strong> 버튼(스마트스토어)에서 진행됩니다.</p>
+      <div class="swatches" style="margin-top:14px">
+        {categories.map((c) => (<a class="tag" href={`#${c.slug}`}>{c.emoji} {c.name}</a>))}
+      </div>
     </div>
   </section>
 
-  {categories.map((c) => (
-    <section class="section" id={c.slug} style={c.slug === 'finish' || c.slug === 'etc' ? 'background:var(--green-50)' : ''}>
+  {categories.map((c, i) => (
+    <section class="section" id={c.slug} style={i % 2 === 1 ? 'background:var(--green-50)' : ''}>
       <div class="container">
         <h2>{c.emoji} {c.name}</h2>
         <p class="lead" style="margin-bottom:24px">{c.desc}</p>
         <div class="grid grid-3">
           {products.filter((p) => p.category === c.slug).map((p) => (
-            <div class="card">
+            <a class="card" href={`/products/${p.slug}/`}>
               <div class="ph">제품 사진</div>
               <h3>{p.name}</h3>
-              <p style="margin:0 0 8px">{p.spec}</p>
-              <div style="margin-bottom:10px">{p.use.map((u) => (<span class="tag">{u}</span>))}</div>
-              <p style="margin:0;font-weight:700;color:var(--ink)">가격: {p.priceNote}</p>
-            </div>
+              <p style="margin:0 0 10px">{p.tagline}</p>
+              {p.specs?.[0] && (<p style="margin:0 0 10px;font-weight:700;color:var(--ink)">{p.specs[0].label}: {p.specs[0].value}</p>)}
+              {p.colors && (
+                <div class="swatches">
+                  {p.colors.slice(0, 7).map((col) => (
+                    col.hex ? <span class="swatch"><span class="dotc" style={`background:${col.hex}`}></span></span>
+                    : col.stripe ? <span class="swatch"><span class="dotc stripe"></span></span>
+                    : <span class="swatch code">{col.name}</span>
+                  ))}
+                </div>
+              )}
+              <span class="tag" style="margin-top:10px">자세히 보기 →</span>
+            </a>
           ))}
         </div>
       </div>
     </section>
   ))}
 
-  <section class="section-tight center">
+  <section class="section-tight">
     <div class="container">
       <div class="banner">
         <div>
-          <h2>마음에 드는 제품을 찾으셨나요?</h2>
-          <p>구매는 네이버 스마트스토어에서 안전하게. 규격이 헷갈리면 먼저 문의해 주세요.</p>
+          <h2>규격·수량이 헷갈리시나요?</h2>
+          <p>필요한 길이나 계단 수를 알려주시면 딱 맞는 제품과 수량을 안내해 드려요.</p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하기</a>

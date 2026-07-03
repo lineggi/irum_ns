@@ -54,6 +54,13 @@ const desc = description ?? site.description;
         <div class="header-actions">
           <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하기</a>
         </div>
+        <details class="m-menu">
+          <summary aria-label="메뉴 열기">☰</summary>
+          <nav class="m-menu-panel" aria-label="모바일 메뉴">
+            {nav.map((item) => (<a href={item.href} aria-current={active === item.href ? 'page' : undefined}>{item.label}</a>))}
+            <a class="buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하기</a>
+          </nav>
+        </details>
       </div>
     </header>
 

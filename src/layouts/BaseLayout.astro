@@ -95,6 +95,25 @@ const desc = description ?? site.description;
       </div>
     </footer>
 
+    <!-- 이미지 확대 보기(라이트박스) -->
+    <div id="lightbox" aria-hidden="true" role="dialog" aria-label="이미지 크게 보기">
+      <span class="x" aria-hidden="true">×</span>
+      <img alt="확대 이미지" />
+    </div>
+    <script is:inline>
+      (function () {
+        var lb = document.getElementById('lightbox');
+        var im = lb.querySelector('img');
+        function close() { lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); im.removeAttribute('src'); }
+        document.addEventListener('click', function (e) {
+          var t = e.target.closest('img[data-zoom]');
+          if (t) { im.src = t.getAttribute('data-full') || t.currentSrc || t.src; lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false'); return; }
+          if (e.target.closest('#lightbox')) close();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+      })();
+    </script>
+
     <!-- 모바일 하단 고정 액션바 -->
     <nav class="mobile-bar" aria-label="빠른 실행">
       <a href={`tel:${site.channels.tel}`}><span class="ico">📞</span>전화</a>

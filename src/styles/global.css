@@ -216,6 +216,14 @@ img { max-width: 100%; display: block; }
   background: var(--green-100); color: var(--brand-dark); font-weight: 800; font-size: .75rem; display: flex; align-items: center; justify-content: center; }
 .note-box { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: var(--radius); padding: 14px 18px; font-weight: 600; font-size: .92rem; }
 
+/* 이미지 확대 보기(라이트박스) */
+img[data-zoom] { cursor: zoom-in; }
+#lightbox { position: fixed; inset: 0; z-index: 100; display: none; align-items: flex-start; justify-content: center;
+  background: rgba(0,0,0,.85); padding: 24px; cursor: zoom-out; overflow: auto; }
+#lightbox.open { display: flex; }
+#lightbox img { max-width: 100%; width: auto; height: auto; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.5); margin: auto; }
+#lightbox .x { position: fixed; top: 14px; right: 20px; color: #fff; font-size: 2.2rem; font-weight: 700; line-height: 1; cursor: pointer; }
+
 /* 제품 상세 이미지(원본 상세페이지 이미지) */
 .detail-img { display: block; width: 100%; max-width: 720px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); margin: 0 auto; }
 

@@ -8,9 +8,6 @@ export const site = {
   storeUrl: 'https://smartstore.naver.com/anjeon_nonslip',
   // 링크 공유 시 나오는 대표 이미지(OG). 파일을 public 경로에 올리면 적용됨.
   ogImage: '/images/guide/stair-tape.jpg',
-  // 채널톡 플러그인 키 (채널톡 데스크 → 설정 → 보안 및 개발 → 플러그인 에서 복사).
-  // 값을 채우면 전 페이지에 채팅 버튼이 표시됩니다. 비우면 미표시.
-  channelTalkPluginKey: '',
   // 문의는 메시지 채널로
   channels: {
     kakao: 'https://pf.kakao.com/_lxmsIG', // 카카오톡 채널 (문의하기)

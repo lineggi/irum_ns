@@ -130,5 +130,13 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
       <a href={site.channels.kakao} target="_blank" rel="noopener"><span class="ico">💬</span>문의</a>
       <a class="buy" href={site.storeUrl} target="_blank" rel="noopener"><span class="ico">🛒</span>구매하기</a>
     </nav>
+
+    {/* 채널톡 라이브 채팅 (플러그인 키가 있을 때만 로드) */}
+    {site.channelTalkPluginKey && (
+      <script is:inline set:html={`
+        (function(){var w=window;if(w.ChannelIO){return (w.console.error||function(){})("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
+        ChannelIO('boot', { "pluginKey": "${site.channelTalkPluginKey}" });
+      `} />
+    )}
   </body>
 </html>

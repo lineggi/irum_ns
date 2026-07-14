@@ -16,6 +16,19 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
+
+    {/* Google Analytics (GA4) */}
+    {site.gaId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.gaId}`}></script>
+        <script is:inline set:html={`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${site.gaId}');
+        `} />
+      </>
+    )}
     <meta name="theme-color" content="#16a34a" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

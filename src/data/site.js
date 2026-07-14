@@ -8,6 +8,8 @@ export const site = {
   storeUrl: 'https://smartstore.naver.com/anjeon_nonslip',
   // 링크 공유 시 나오는 대표 이미지(OG). 파일을 public 경로에 올리면 적용됨.
   ogImage: '/images/guide/stair-tape.jpg',
+  // Google Analytics(GA4) 측정 ID. 비우면 미적용.
+  gaId: 'G-75HJ8B6NNX',
   // 문의는 메시지 채널로
   channels: {
     kakao: 'https://pf.kakao.com/_lxmsIG', // 카카오톡 채널 (문의하기)

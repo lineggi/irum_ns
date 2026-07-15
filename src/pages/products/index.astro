@@ -78,7 +78,12 @@ const nonslip = [
       <p style="font-size:14.5px; color:#6b7280; margin:2px 0 0;">계단 단수와 폭을 입력하면 대략 필요한 길이와 수량을 알려드려요.</p>
       <div class="calc-grid" style="display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:14px; margin-top:18px;">
         <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">계단 단수</span><input id="calc-steps" type="number" min="1" inputmode="numeric" placeholder="예: 15" class="calc-in" /></label>
-        <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">한 단 폭 (cm)</span><input id="calc-width" type="number" min="1" inputmode="numeric" placeholder="예: 100" class="calc-in" /></label>
+        <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">한 단 폭</span>
+          <div style="display:flex; gap:8px;">
+            <input id="calc-width" type="number" min="1" inputmode="numeric" placeholder="예: 100" class="calc-in" style="margin-top:6px;" />
+            <select id="calc-unit" class="calc-in" style="margin-top:6px; width:82px; flex:0 0 auto;"><option value="cm">cm</option><option value="mm">mm</option></select>
+          </div>
+        </label>
         <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">제품 종류</span>
           <select id="calc-type" class="calc-in"><option value="tape">논슬립 테이프 (롤)</option><option value="bar">각 논슬립 (세라믹·알루미늄)</option></select>
         </label>
@@ -187,23 +192,26 @@ const nonslip = [
     (function () {
       var steps = document.getElementById('calc-steps');
       var width = document.getElementById('calc-width');
+      var unit = document.getElementById('calc-unit');
       var type = document.getElementById('calc-type');
       var out = document.getElementById('calc-result');
-      if (!steps || !width || !type || !out) return;
+      if (!steps || !width || !unit || !type || !out) return;
       function calc() {
-        var s = parseFloat(steps.value), w = parseFloat(width.value), t = type.value;
+        var s = parseFloat(steps.value), w = parseFloat(width.value), u = unit.value, t = type.value;
+        width.placeholder = u === 'mm' ? '예: 1000' : '예: 100';
         if (!s || !w || s <= 0 || w <= 0) { out.innerHTML = '계단 단수와 한 단 폭을 입력해 주세요.'; return; }
-        var total = s * (w / 100);
+        var wMeters = u === 'mm' ? w / 1000 : w / 100;
+        var total = s * wMeters;
         var margin = total * 1.1;
         var f = function (n) { return (Math.round(n * 10) / 10).toFixed(1); };
         if (t === 'tape') {
           var r30 = Math.ceil(margin / 30), r15 = Math.ceil(margin / 15);
           out.innerHTML = '총 필요 길이 <b>약 ' + f(total) + 'm</b> (여유 포함 <b>' + f(margin) + 'm</b>)<br>→ 30m 롤 <b>' + r30 + '개</b> 또는 15m 롤 <b>' + r15 + '개</b>';
         } else {
-          out.innerHTML = '한 단당 1개씩, 총 <b>' + s + '개</b> 필요 · 각 <b>' + w + 'cm</b> 폭으로 재단<br>총 재단 길이 <b>약 ' + f(total) + 'm</b> (여유 포함 ' + f(margin) + 'm)';
+          out.innerHTML = '한 단당 1개씩, 총 <b>' + s + '개</b> 필요 · 각 <b>' + w + u + '</b> 폭으로 재단<br>총 재단 길이 <b>약 ' + f(total) + 'm</b> (여유 포함 ' + f(margin) + 'm)';
         }
       }
-      [steps, width, type].forEach(function (el) { el.addEventListener('input', calc); el.addEventListener('change', calc); });
+      [steps, width, unit, type].forEach(function (el) { el.addEventListener('input', calc); el.addEventListener('change', calc); });
     })();
   </script>
 </BaseLayout>

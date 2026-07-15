@@ -33,37 +33,19 @@ import { site } from '../data/site.js';
     </div>
   </section>
 
-  <!-- 문의 폼 + 안내 -->
+  <!-- 상담 안내 -->
   <section style="max-width:1080px; margin:0 auto; padding:26px 20px 20px;">
-    <div class="contact-grid" style="display:grid; grid-template-columns:1.3fr .7fr; gap:24px; align-items:start;">
-      <form id="inquiry" style="background:#fff; border:1px solid #ecece6; border-radius:22px; padding:30px; box-shadow:0 6px 20px rgba(31,41,55,.06);">
-        <h2 style="font-size:20px; font-weight:800; margin:0 0 6px;">간편 문의 남기기</h2>
-        <p style="font-size:14px; color:#6b7280; margin-bottom:20px;">작성 후 보내기를 누르면 메일 앱으로 내용이 담깁니다. 빠른 상담은 카카오톡을 이용해 주세요.</p>
-        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-          <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">이름</span><input name="name" type="text" placeholder="성함" style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #ecece6; border-radius:12px; font-size:14.5px; font-family:inherit; background:#fbfaf7; box-sizing:border-box;" /></label>
-          <label style="display:block;"><span style="font-size:13px; font-weight:700; color:#4b5563;">연락처</span><input name="phone" type="tel" placeholder="010-0000-0000" style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #ecece6; border-radius:12px; font-size:14.5px; font-family:inherit; background:#fbfaf7; box-sizing:border-box;" /></label>
+    <div class="contact-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start;">
+      <div style="background:#ecfdf5; border:1px solid #d1fae5; border-radius:18px; padding:22px;">
+        <div style="font-weight:800; font-size:16px; color:#15803d;">상담 안내</div>
+        <div style="display:grid; gap:10px; margin-top:12px; font-size:14px; color:#4b5563;">
+          <div><b style="color:#1f2937;">운영시간</b><br />평일 09:00 – 18:00</div>
+          <div><b style="color:#1f2937;">주소</b><br />{site.business.address}</div>
         </div>
-        <label style="display:block; margin-top:14px;"><span style="font-size:13px; font-weight:700; color:#4b5563;">문의 제품</span>
-          <select name="product" style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #ecece6; border-radius:12px; font-size:14.5px; font-family:inherit; background:#fbfaf7; box-sizing:border-box;">
-            <option>논슬립 (테이프·세라믹·알루미늄)</option><option>마감재 (데코트림·프로파일)</option><option>굽도리</option><option>기타 부자재·접착제</option><option>잘 모르겠어요 / 추천받고 싶어요</option>
-          </select>
-        </label>
-        <label style="display:block; margin-top:14px;"><span style="font-size:13px; font-weight:700; color:#4b5563;">문의 내용</span><textarea name="message" rows="4" placeholder="시공 부위, 대략적인 길이/수량, 궁금한 점을 적어주세요." style="width:100%; margin-top:6px; padding:12px 14px; border:1px solid #ecece6; border-radius:12px; font-size:14.5px; font-family:inherit; background:#fbfaf7; box-sizing:border-box; resize:vertical;"></textarea></label>
-        <button type="submit" style="margin-top:18px; width:100%; padding:15px; border:none; border-radius:999px; font-weight:800; font-size:16px; color:#fff; background:#f97316; cursor:pointer; box-shadow:0 8px 20px rgba(249,115,22,.32);">문의 보내기</button>
-        <p style="font-size:12px; color:#9aa197; margin-top:10px; text-align:center;">* 빠른 상담은 상단 카카오톡 채널을 이용해 주세요.</p>
-      </form>
-      <div style="display:grid; gap:16px;">
-        <div style="background:#ecfdf5; border:1px solid #d1fae5; border-radius:18px; padding:22px;">
-          <div style="font-weight:800; font-size:16px; color:#15803d;">상담 안내</div>
-          <div style="display:grid; gap:10px; margin-top:12px; font-size:14px; color:#4b5563;">
-            <div><b style="color:#1f2937;">운영시간</b><br />평일 09:00 – 18:00</div>
-            <div><b style="color:#1f2937;">주소</b><br />{site.business.address}</div>
-          </div>
-        </div>
-        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:18px; padding:22px;">
-          <div style="font-weight:800; font-size:16px; color:#9a3412;">문의 전 팁</div>
-          <p style="font-size:13.5px; color:#9a3412; margin-top:8px; line-height:1.6;">시공 부위 사진과 대략적인 길이를 알려주시면 훨씬 정확하게 안내해 드릴 수 있어요.</p>
-        </div>
+      </div>
+      <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:18px; padding:22px;">
+        <div style="font-weight:800; font-size:16px; color:#9a3412;">문의 전 팁</div>
+        <p style="font-size:13.5px; color:#9a3412; margin-top:8px; line-height:1.6;">시공 부위 사진과 대략적인 길이를 알려주시면 훨씬 정확하게 안내해 드릴 수 있어요. 카카오톡 채널로 사진을 첨부해 문의하시면 가장 빠릅니다.</p>
       </div>
     </div>
   </section>
@@ -76,21 +58,6 @@ import { site } from '../data/site.js';
     </div>
   </section>
 
-  <script is:inline define:vars={{ email: site.channels.email }}>
-    var f = document.getElementById('inquiry');
-    if (f) f.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var d = new FormData(f);
-      var body =
-        '이름: ' + (d.get('name') || '') + '\n' +
-        '연락처: ' + (d.get('phone') || '') + '\n' +
-        '문의 제품: ' + (d.get('product') || '') + '\n\n' +
-        (d.get('message') || '');
-      window.location.href =
-        'mailto:' + email + '?subject=' + encodeURIComponent('[홈페이지 문의] ' + (d.get('name') || '')) +
-        '&body=' + encodeURIComponent(body);
-    });
-  </script>
 </BaseLayout>
 
 <style>
@@ -99,6 +66,5 @@ import { site } from '../data/site.js';
   @media (max-width: 820px) {
     .chan-grid { grid-template-columns: 1fr !important; }
     .contact-grid { grid-template-columns: 1fr !important; }
-    .form-row { grid-template-columns: 1fr !important; }
   }
 </style>

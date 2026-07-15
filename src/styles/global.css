@@ -122,6 +122,8 @@ img { max-width: 100%; display: block; }
 .gnb a { padding: 8px 14px; border-radius: 999px; font-weight: 600; color: var(--ink-soft); }
 .gnb a:hover, .gnb a[aria-current="page"] { background: #fff; color: var(--brand-dark); box-shadow: var(--shadow); }
 .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+/* 헤더 버튼은 컴팩트하게 */
+.site-header .header-actions .btn { min-height: 42px; padding: 10px 18px; font-size: 14px; }
 
 @media (min-width: 860px) {
   .gnb { display: flex; }

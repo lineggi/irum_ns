@@ -67,14 +67,15 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
   <body>
     <header class="site-header">
       <div class="container bar">
-        <a class="brand" href="/"><img class="brand-mark" src="/images/logo-mark.png" alt="" width="34" height="34" />{site.name}</a>
+        <a class="brand" href="/"><img class="brand-mark" src="/images/logo-mark.png" alt="" width="34" height="34" />이룸<span style="color:#16a34a">NS</span></a>
         <nav class="gnb" aria-label="주요 메뉴">
           {nav.map((item) => (
             <a href={item.href} aria-current={active === item.href ? 'page' : undefined}>{item.label}</a>
           ))}
         </nav>
         <div class="header-actions">
-          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하기</a>
+          <a class="btn btn-ghost" href={site.channels.kakao} target="_blank" rel="noopener">카톡 문의</a>
+          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">구매하기</a>
         </div>
         <details class="m-menu">
           <summary aria-label="메뉴 열기">☰</summary>

@@ -1,120 +1,124 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site.js';
-import { categories } from '../data/products.js';
-import { cases, guides } from '../data/content.js';
 ---
 
 <BaseLayout active="/">
-  <!-- 히어로 -->
-  <section class="hero">
-    <div class="container section hero-inner">
-      <div>
-        <span class="eyebrow">개인 구매자를 위한 논슬립</span>
-        <h1>미끄러운 계단·현관,<br />논슬립으로 안심하세요</h1>
-        <p class="lead">계단·현관·경사로 미끄럼 방지 논슬립을 저렴하게. 혼자서도 쉽게 시공할 수 있도록 시공 방법까지 알려드려요.</p>
-        <div class="hero-cta">
-          <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하러 가기</a>
-          <a class="btn btn-ghost" href="/guide/">🔧 혼자 시공하는 법</a>
-        </div>
-        <div class="hero-badges">
-          <span>✅ 초보자도 OK</span>
-          <span>💸 합리적인 가격</span>
-          <span>📦 스마트스토어 안전거래</span>
-        </div>
-      </div>
-      <img class="thumb" style="aspect-ratio:1/1;margin:0" src="/images/cases/case004.jpg" alt="계단 논슬립 시공 현장" loading="eager" />
-    </div>
-  </section>
-
-  <!-- 제품 카테고리 -->
-  <section class="section">
-    <div class="container">
-      <div class="center">
-        <span class="eyebrow">제품소개</span>
-        <h2>어떤 제품이 필요하세요?</h2>
-        <p class="lead" style="margin:0 auto 28px">용도에 맞게 골라보세요. 잘 모르겠다면 문의로 물어보셔도 좋아요.</p>
-      </div>
-      <div class="grid grid-4">
-        {categories.map((c) => (
-          <a class="card center" href={`/products/#${c.slug}`}>
-            <div class="emoji">{c.emoji}</div>
-            <h3>{c.name}</h3>
-            <p style="margin:0">{c.desc}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- 셀프 시공 배너 -->
-  <section class="section-tight">
-    <div class="container">
-      <div class="banner">
+  <!-- ===== HERO ===== -->
+  <section style="background:linear-gradient(180deg,#ecfdf5,#fbfaf7);">
+    <div style="max-width:1080px; margin:0 auto; padding:56px 20px 50px;">
+      <div class="hero-grid" style="display:grid; grid-template-columns:1.05fr .95fr; gap:40px; align-items:center;">
         <div>
-          <h2>혼자서도 충분히 할 수 있어요 🙌</h2>
-          <p>공구만 있으면 30분이면 끝! 사진과 함께 따라 하는 단계별 시공 가이드를 준비했어요.</p>
+          <span style="display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:13px; color:#15803d; background:#fff; border:1px solid #d1fae5; padding:6px 13px; border-radius:999px;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;"></span>국내 생산 · 개인 셀프시공 가능</span>
+          <h1 class="hero-h1" style="font-size:46px; line-height:1.18; letter-spacing:-.03em; font-weight:800; color:#1f2937; margin:18px 0 14px;">미끄럼 걱정 없이,<br />안심하는 일상</h1>
+          <p style="font-size:17px; line-height:1.7; color:#4b5563; max-width:42ch;">계단·현관·경사로 미끄럼 방지 논슬립을 합리적인 가격에. 혼자서도 붙일 수 있게 시공 가이드까지 알려드려요.</p>
+          <div class="hero-cta" style="display:flex; flex-wrap:wrap; gap:12px; margin-top:24px;">
+            <a href={site.storeUrl} target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:15px 26px; border-radius:999px; font-weight:700; font-size:16px; color:#fff; background:#f97316; box-shadow:0 8px 20px rgba(249,115,22,.32);">스마트스토어 구매하기 →</a>
+            <a href="/contact/" style="display:inline-flex; align-items:center; justify-content:center; padding:15px 24px; border-radius:999px; font-weight:700; font-size:16px; color:#1f2937; background:#fff; border:1px solid #ecece6;">카카오톡 상담</a>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:22px; margin-top:26px; color:#4b5563; font-weight:600; font-size:14px;">
+            <span>✓ 국내 생산 내구성</span><span>✓ 강한 접착력</span><span>✓ 30분 셀프시공</span>
+          </div>
         </div>
-        <a class="btn btn-ghost" href="/guide/">시공 가이드 보기 →</a>
+        <div style="position:relative;">
+          <img src="/images/guide/stair-tape.jpg" alt="논슬립 테이프 셀프 시공 모습" style="width:100%; aspect-ratio:4/3.4; object-fit:cover; border-radius:22px; box-shadow:0 18px 40px rgba(31,41,55,.16);" />
+          <div style="position:absolute; left:-14px; bottom:22px; background:#fff; border:1px solid #ecece6; border-radius:16px; padding:13px 17px; box-shadow:0 12px 28px rgba(31,41,55,.14);">
+            <div style="font-size:13px; color:#6b7280; font-weight:600;">시공 사례</div>
+            <div style="font-size:22px; font-weight:800; color:#15803d;">11건+ <span style="font-size:13px; color:#6b7280; font-weight:600;">실사진 보유</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 시공 가이드 미리보기 -->
-  <section class="section">
-    <div class="container">
-      <div class="center">
-        <span class="eyebrow">시공가이드</span>
-        <h2>따라 하기 쉬운 시공법</h2>
-      </div>
-      <div class="grid grid-3">
-        {guides.map((g) => (
-          <a class="card" href={`/guide/#${g.slug}`}>
-            {g.img
-              ? <img class="thumb" src={g.img} alt={g.title} loading="lazy"
-                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'시공 사진'}))" />
-              : <div class="ph">시공 사진</div>}
-            <span class="tag">⏱ 약 {g.minutes}분</span>
-            <span class="tag">{g.level}</span>
-            <h3>{g.title}</h3>
-            <p style="margin:0">{g.summary}</p>
-          </a>
-        ))}
+  <!-- ===== TRUST STRIP ===== -->
+  <div style="max-width:1080px; margin:0 auto; padding:0 20px;">
+    <div class="trust-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:#ecece6; border:1px solid #ecece6; border-radius:16px; overflow:hidden;">
+      <div style="background:#fff; padding:20px 22px;"><div style="font-weight:800; font-size:16px; color:#1f2937;">국내 생산</div><div style="font-size:13px; color:#6b7280;">해지지 않는 내구성</div></div>
+      <div style="background:#fff; padding:20px 22px;"><div style="font-weight:800; font-size:16px; color:#1f2937;">강한 접착력</div><div style="font-size:13px; color:#6b7280;">석재·철재·타일 부착</div></div>
+      <div style="background:#fff; padding:20px 22px;"><div style="font-weight:800; font-size:16px; color:#1f2937;">셀프 시공 가이드</div><div style="font-size:13px; color:#6b7280;">초보도 30분 완성</div></div>
+      <div style="background:#fff; padding:20px 22px;"><div style="font-weight:800; font-size:16px; color:#1f2937;">메시지 상담</div><div style="font-size:13px; color:#6b7280;">카톡·전화 문의</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 대표 제품 ===== -->
+  <section style="max-width:1080px; margin:0 auto; padding:58px 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:26px; gap:16px;">
+      <div><div style="font-weight:700; font-size:13px; color:#15803d;">대표 제품</div><h2 style="font-size:27px; font-weight:800; letter-spacing:-.02em; color:#1f2937; margin:6px 0 0;">현장이 가장 많이 찾는 논슬립</h2></div>
+      <a href="/products/" style="font-weight:700; font-size:14px; color:#15803d; white-space:nowrap;">전체 제품 보기 →</a>
+    </div>
+    <div class="prod-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+      {[
+        { img: '/images/products/nonslip-tape.jpg', name: '세라믹 논슬립 테이프', desc: '붙이기만 하면 끝. 누구나 쉬운 시공.', href: '/products/#nonslip' },
+        { img: '/images/products/ceramic-62.jpg', name: '세라믹 각 논슬립 62', desc: 'ㄱ자로 계단 코를 확실히 보호.', href: '/products/#nonslip' },
+        { img: '/images/products/al-60s.jpg', name: '알루미늄 논슬립 AL 60-S', desc: '넓은 고무패드 삽입, 빌딩·관공서용.', href: '/products/#nonslip' },
+      ].map((p) => (
+        <a href={p.href} class="prodcard" style="display:block; background:#fff; border:1px solid #ecece6; border-radius:20px; overflow:hidden; box-shadow:0 6px 20px rgba(31,41,55,.06);">
+          <img src={p.img} alt={p.name} style="width:100%; aspect-ratio:4/3; object-fit:cover; object-position:top;" />
+          <div style="padding:18px 20px;"><div style="display:flex; gap:6px; margin-bottom:8px;"><span style="font-size:12px; font-weight:600; color:#15803d; background:#d1fae5; padding:3px 9px; border-radius:999px;">논슬립</span></div><div style="font-weight:800; font-size:17px; color:#1f2937;">{p.name}</div><p style="font-size:13.5px; color:#6b7280; margin-top:5px; line-height:1.5;">{p.desc}</p></div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== 왜 논슬립 ===== -->
+  <section style="background:#fff; border-top:1px solid #ecece6; border-bottom:1px solid #ecece6;">
+    <div style="max-width:1080px; margin:0 auto; padding:56px 20px;">
+      <div style="text-align:center; margin-bottom:34px;"><div style="font-weight:700; font-size:13px; color:#15803d;">왜 논슬립인가</div><h2 style="font-size:27px; font-weight:800; letter-spacing:-.02em; color:#1f2937; margin:6px 0 0;">작은 미끄럼이 큰 사고가 됩니다</h2></div>
+      <div class="reason-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+        <div style="background:#fbfaf7; border:1px solid #ecece6; border-radius:20px; padding:26px;"><div style="font-weight:800; font-size:18px; color:#1f2937;">계단·경사로</div><p style="font-size:14.5px; color:#6b7280; margin-top:8px; line-height:1.65;">비 오는 날 젖은 계단, 대리석·타일 위 미끄러짐을 확실히 잡아줍니다.</p></div>
+        <div style="background:#fbfaf7; border:1px solid #ecece6; border-radius:20px; padding:26px;"><div style="font-weight:800; font-size:18px; color:#1f2937;">가정 · 어르신</div><p style="font-size:14.5px; color:#6b7280; margin-top:8px; line-height:1.65;">현관·욕실 앞 등 낙상 위험 구간에 붙여 어르신·아이를 지킵니다.</p></div>
+        <div style="background:#fbfaf7; border:1px solid #ecece6; border-radius:20px; padding:26px;"><div style="font-weight:800; font-size:18px; color:#1f2937;">건물 · 상가</div><p style="font-size:14.5px; color:#6b7280; margin-top:8px; line-height:1.65;">호텔·빌딩·관공서 계단까지, 규격과 색상을 골라 마감합니다.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 시공 사례 -->
-  <section class="section" style="background:var(--green-50)">
-    <div class="container">
-      <div class="center">
-        <span class="eyebrow">시공사례</span>
-        <h2>실제 시공 현장</h2>
-        <p class="lead" style="margin:0 auto 28px">계단·경사로에 직접 시공한 현장을 확인해 보세요.</p>
-      </div>
-      <div class="gallery">
-        {cases.slice(0, 6).map((c) => (
-          <figure>
-            <img src={c.img} alt={c.title} data-zoom data-full={c.img} loading="lazy" />
-            <figcaption>{c.title}<small>{c.note}</small></figcaption>
-          </figure>
-        ))}
-      </div>
-      <div class="center" style="margin-top:24px">
-        <a class="btn btn-ghost" href="/cases/">시공사례 더 보기 →</a>
-      </div>
+  <!-- ===== 시공가이드 BAND ===== -->
+  <section style="max-width:1080px; margin:0 auto; padding:56px 20px;">
+    <div class="band-grid" style="background:linear-gradient(120deg,#16a34a,#15803d); border-radius:24px; padding:44px; display:grid; grid-template-columns:1fr auto; gap:24px; align-items:center;">
+      <div><h2 style="color:#fff; font-size:26px; font-weight:800; margin:0 0 8px; letter-spacing:-.02em;">혼자서도 붙일 수 있어요</h2><p style="color:rgba(255,255,255,.9); font-size:15px; line-height:1.6;">계단 논슬립 셀프 시공 5단계, 30분이면 끝. 준비물부터 마감까지 사진으로 안내해요.</p></div>
+      <a href="/guide/" style="display:inline-flex; align-items:center; justify-content:center; padding:15px 26px; border-radius:999px; font-weight:700; font-size:16px; color:#15803d; background:#fff; white-space:nowrap;">시공 가이드 보기 →</a>
     </div>
   </section>
 
-  <!-- 문의 CTA -->
-  <section class="section center">
-    <div class="container">
-      <h2>궁금한 점이 있으신가요?</h2>
-      <p class="lead" style="margin:0 auto 24px">제품 선택, 필요 수량, 시공 방법 무엇이든 메시지로 편하게 물어보세요.</p>
-      <div class="hero-cta" style="justify-content:center">
-        <a class="btn btn-primary" href="/contact/">💬 문의하기</a>
-        <a class="btn btn-buy" href={site.storeUrl} target="_blank" rel="noopener">🛒 구매하러 가기</a>
+  <!-- ===== 시공사례 PREVIEW ===== -->
+  <section style="max-width:1080px; margin:0 auto; padding:0 20px 58px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; gap:16px;">
+      <div><div style="font-weight:700; font-size:13px; color:#15803d;">시공 사례</div><h2 style="font-size:27px; font-weight:800; letter-spacing:-.02em; color:#1f2937; margin:6px 0 0;">실제 현장에서 확인하세요</h2></div>
+      <a href="/cases/" style="font-weight:700; font-size:14px; color:#15803d; white-space:nowrap;">사례 더 보기 →</a>
+    </div>
+    <div class="gallery-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+      {['case001', 'case004', 'case007', 'case009'].map((c) => (
+        <figure class="gcell" style="margin:0; border-radius:18px; overflow:hidden; border:1px solid #ecece6; box-shadow:0 6px 20px rgba(31,41,55,.06);"><img src={`/images/cases/${c}.jpg`} alt="시공 현장" data-zoom data-full={`/images/cases/${c}.jpg`} style="width:100%; aspect-ratio:3/4; object-fit:cover;" /></figure>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== 문의 CTA ===== -->
+  <section style="background:#fff; border-top:1px solid #ecece6;">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 20px; text-align:center;">
+      <h2 style="font-size:26px; font-weight:800; letter-spacing:-.02em; color:#1f2937; margin:0 0 8px;">어떤 제품이 맞을지 모르겠다면</h2>
+      <p style="font-size:15.5px; color:#6b7280; margin:0 auto 24px; max-width:44ch;">시공 부위와 사진을 보내주시면, 맞는 규격·색상을 안내해 드립니다.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href={site.channels.kakao} target="_blank" rel="noopener" style="padding:14px 26px; border-radius:999px; font-weight:700; font-size:15.5px; color:#1f2937; background:#fee500;">카카오톡 문의</a>
+        <a href={`tel:${site.channels.tel}`} style="padding:14px 26px; border-radius:999px; font-weight:700; font-size:15.5px; color:#fff; background:#16a34a;">{site.channels.tel}</a>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .prodcard { transition: transform .15s ease, box-shadow .15s ease; }
+  .prodcard:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(31, 41, 55, .14); }
+  .gcell { transition: transform .15s ease; }
+  .gcell:hover { transform: translateY(-3px); }
+  @media (max-width: 820px) {
+    .hero-grid { grid-template-columns: 1fr !important; }
+    .prod-grid, .reason-grid { grid-template-columns: 1fr !important; }
+    .trust-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .band-grid { grid-template-columns: 1fr !important; }
+    .hero-h1 { font-size: 34px !important; }
+    .hero-cta a { width: 100%; }
+  }
+</style>

@@ -136,6 +136,19 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
       })();
+
+      // GA4 전환 추적: 구매/문의/전화/메일 클릭을 이벤트로 전송
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest('a[href]');
+        if (!a || typeof window.gtag !== 'function') return;
+        var href = a.getAttribute('href') || '';
+        var label = (a.textContent || '').trim().slice(0, 40);
+        var page = location.pathname;
+        if (href.indexOf('smartstore.naver.com') !== -1) window.gtag('event', 'click_buy', { link_url: href, link_text: label, page_path: page });
+        else if (href.indexOf('pf.kakao.com') !== -1 || href.indexOf('talk.naver.com') !== -1) window.gtag('event', 'click_inquiry', { link_url: href, link_text: label, page_path: page });
+        else if (href.indexOf('tel:') === 0) window.gtag('event', 'click_call', { link_url: href, page_path: page });
+        else if (href.indexOf('mailto:') === 0) window.gtag('event', 'click_email', { link_url: href, page_path: page });
+      });
     </script>
 
     <!-- 모바일 하단 고정 액션바 -->

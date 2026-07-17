@@ -3,10 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { site } from '../../data/site.js';
 
-const CERAMIC = ['#d7d2c7', '#9aa0a6', '#2b2b2b', '#f4c400', '#2e7d32', '#6d3b2a', 'stripe'];
-const RUBBER = ['#1f5e3a', '#23305e', '#222222', '#e0b400', '#9e2b25', '#5b3b2e', '#8a8f98'];
-const COLORSETS = { '세라믹': CERAMIC, '고무패드': RUBBER, '없음': [] };
-
 // 어드민(Sveltia CMS)에서 관리하는 제품 컬렉션을 불러와 정렬
 const allProducts = (await getCollection('products'))
   .map((e) => e.data)
@@ -72,7 +68,7 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
       <section id={cat.id} style="max-width:1080px; margin:0 auto; padding:46px 20px 10px; scroll-margin-top:76px;">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">{cat.key}</h2><span style="font-size:14px; color:#6b7280;">{cat.sub}</span></div>
         {items.map((p) => {
-          const colors = COLORSETS[p.colorSet] || [];
+          const colors = p.colors || [];
           return (
             <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06); margin-bottom:20px;">
               <img src={p.image} alt={p.name} data-zoom data-full={p.image} style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
@@ -100,7 +96,7 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
                   <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center;">
                     <span style="font-size:13px; color:#6b7280; font-weight:600;">색상</span>
                     {colors.map((c) => (
-                      <span style={`width:22px; height:22px; border-radius:6px; border:1px solid rgba(0,0,0,.12); background:${c === 'stripe' ? 'repeating-linear-gradient(45deg,#f4c400 0 5px,#1c1c1c 5px 10px)' : c};`}></span>
+                      <span style={`width:22px; height:22px; border-radius:6px; border:1px solid rgba(0,0,0,.12); background:${c};`}></span>
                     ))}
                   </div>
                 )}

@@ -12,6 +12,5 @@ specs:
     value: 폭 53mm(W) × 높이 16mm(H)
   - label: 재질
     value: 알루미늄
-colorSet: 없음
 order: 6
 ---

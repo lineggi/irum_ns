@@ -14,6 +14,5 @@ specs:
     value: 3mm × 2400mm
   - label: 그 외
     value: 카펫몰딩 · AL302 · 데코논슬립 A/B 등
-colorSet: 없음
 order: 10
 ---

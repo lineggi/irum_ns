@@ -11,6 +11,5 @@ specs:
     value: 20ctg × 310ml
   - label: 타입
     value: 습기경화용 1액형 폴리우레탄
-colorSet: 없음
 order: 30
 ---

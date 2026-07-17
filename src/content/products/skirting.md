@@ -10,6 +10,5 @@ specs:
     value: 75mm · 다양한 우드 컬러 (양면테이프)
   - label: 무지굽도리
     value: 75/100mm · 단색 (양면테이프)
-colorSet: 없음
 order: 20
 ---

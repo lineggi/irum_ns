@@ -1,54 +1,25 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 import { site } from '../../data/site.js';
 
 const CERAMIC = ['#d7d2c7', '#9aa0a6', '#2b2b2b', '#f4c400', '#2e7d32', '#6d3b2a', 'stripe'];
 const RUBBER = ['#1f5e3a', '#23305e', '#222222', '#e0b400', '#9e2b25', '#5b3b2e', '#8a8f98'];
+const COLORSETS = { '세라믹': CERAMIC, '고무패드': RUBBER, '없음': [] };
 
-const nonslip = [
-  {
-    img: 'nonslip-tape', name: '세라믹 논슬립 테이프',
-    desc: '암석(세라믹) 재질 테이프 — 붙이기만 하면 끝나는 미끄럼 방지',
-    feats: ['테이프로 간편하게 부착, 누구나 쉬운 시공', '석재·철재·타일에도 잘 붙는 강한 접착력', '국내 생산, 해지지 않는 내구성'],
-    specs: [['규격', '폭 50mm × 길이 30m / 15m'], ['재질', '세라믹(암석입자)']],
-    colors: CERAMIC,
-  },
-  {
-    img: 'ceramic-62', name: '세라믹 각 논슬립 62',
-    desc: 'ㄱ자 형태로 계단 코를 감싸는 세라믹 논슬립',
-    feats: ['ㄱ자 디자인으로 계단 모서리 확실히 보호', '2mm 초슬립형 두께로 보행이 부드러움', '특수 광물입자 사용 · 내구성 우수'],
-    specs: [['규격', '폭 62mm(W) × 높이 20mm(H)'], ['두께', '2mm 초슬립형']],
-    colors: CERAMIC,
-    note: '에폭시 시공 시 뒷면 양면테이프 부착이 간편 (테이프 부착 별도 1M 500원)',
-  },
-  {
-    img: 'nsCeramic02', name: '세라믹 각 논슬립 75',
-    desc: '더 넓은 폭으로 안정감을 높인 세라믹 각 논슬립',
-    feats: ['ㄱ자 디자인 · 넓은 75mm 폭', '2mm 초슬립형 두께', '특수 광물입자 사용 · 내구성 우수'],
-    specs: [['규격', '폭 75mm(W) × 높이 25mm(H)'], ['두께', '2mm 초슬립형']],
-    colors: CERAMIC,
-  },
-  {
-    img: 'al-60s', name: '알루미늄 논슬립 AL 60-S',
-    desc: '넓은 고무 패드를 삽입한 알루미늄 ㄱ자 논슬립',
-    feats: ['ㄱ자 디자인 · 넓은 고무 패드 삽입', '고온 열처리한 미끄럼방지 패드', '호텔·빌딩·관공서 등 건물 실내외 계단용'],
-    specs: [['규격', '폭 57mm(W) × 높이 27mm(H)'], ['재질', '알루미늄 + 고무 패드']],
-    colors: RUBBER,
-  },
-  {
-    img: 'nsAL601-1', name: '알루미늄 논슬립 AL 601-1',
-    desc: '넓은 고무패드 삽입형, 높이감 있는 알루미늄 논슬립',
-    feats: ['넓은 고무 패드 삽입 디자인', '고온 열처리한 미끄럼방지 패드', '내마모성 우수 · 관리 용이'],
-    specs: [['규격', '폭 58mm(W) × 높이 37mm(H)'], ['재질', '알루미늄 + 고무 패드']],
-    colors: RUBBER,
-  },
-  {
-    img: 'nsAL507', name: '알루미늄 논슬립 AL 507',
-    desc: '얇고 세련된 디자인의 알루미늄 논슬립',
-    feats: ['내마모성이 우수', '관리 용이 · 세련된 디자인', '미끄럼 방지 효과'],
-    specs: [['규격', '폭 53mm(W) × 높이 16mm(H)'], ['재질', '알루미늄']],
-  },
+// 어드민(Sveltia CMS)에서 관리하는 제품 컬렉션을 불러와 정렬
+const allProducts = (await getCollection('products'))
+  .map((e) => e.data)
+  .sort((a, b) => a.order - b.order);
+
+// 카테고리 순서·앵커·부제 (카테고리 네비/섹션 공통)
+const CATS = [
+  { key: '논슬립', id: 'nonslip', sub: '계단·출입구 미끄럼 방지 핵심 제품' },
+  { key: '마감재', id: 'finish', sub: '타일·바닥 끝단 마감용 알루미늄' },
+  { key: '굽도리', id: 'skirting', sub: '벽·바닥 경계 걸레받이' },
+  { key: '기타', id: 'etc', sub: '시공용 접착 부자재' },
 ];
+const byCat = (key) => allProducts.filter((p) => p.category === key);
 ---
 
 <BaseLayout title="제품소개" active="/products/" description="논슬립(테이프·세라믹·알루미늄), 마감재, 굽도리, 접착 부자재. 규격·색상까지 확인하고 스마트스토어에서 구매하세요.">
@@ -93,91 +64,54 @@ const nonslip = [
     </div>
   </section>
 
-  <!-- ===== 논슬립 ===== -->
-  <section id="nonslip" style="max-width:1080px; margin:0 auto; padding:46px 20px 10px; scroll-margin-top:76px;">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">논슬립</h2><span style="font-size:14px; color:#6b7280;">계단·출입구 미끄럼 방지 핵심 제품</span></div>
-    {nonslip.map((p) => (
-      <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06); margin-bottom:20px;">
-        <img src={`/images/products/${p.img}.jpg`} alt={p.name} data-zoom data-full={`/images/products/${p.img}.jpg`} style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
-        <div>
-          <div style="font-weight:800; font-size:21px; color:#1f2937;">{p.name}</div>
-          <p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">{p.desc}</p>
-          <ul style="list-style:none; padding:0; margin:0 0 18px; display:grid; gap:8px;">
-            {p.feats.map((f) => (<li style="padding-left:26px; position:relative; font-size:14.5px;"><span style="position:absolute; left:0; color:#16a34a; font-weight:800;">✓</span>{f}</li>))}
-          </ul>
-          <table style="width:100%; border-collapse:collapse; border:1px solid #ecece6; border-radius:12px; overflow:hidden; font-size:14px;">
-            {p.specs.map(([k, v], i) => (
-              <tr><th style={`text-align:left; width:34%; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px;${i < p.specs.length - 1 ? ' border-bottom:1px solid #ecece6;' : ''}`}>{k}</th><td style={`padding:10px 14px;${i < p.specs.length - 1 ? ' border-bottom:1px solid #ecece6;' : ''}`}>{v}</td></tr>
-            ))}
-          </table>
-          {p.colors && (
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center;">
-              <span style="font-size:13px; color:#6b7280; font-weight:600;">색상</span>
-              {p.colors.map((c) => (
-                <span style={`width:22px; height:22px; border-radius:6px; border:1px solid rgba(0,0,0,.12); background:${c === 'stripe' ? 'repeating-linear-gradient(45deg,#f4c400 0 5px,#1c1c1c 5px 10px)' : c};`}></span>
-              ))}
+  <!-- ===== 카테고리별 제품 (어드민 컬렉션 기반) ===== -->
+  {CATS.map((cat) => {
+    const items = byCat(cat.key);
+    if (items.length === 0) return null;
+    return (
+      <section id={cat.id} style="max-width:1080px; margin:0 auto; padding:46px 20px 10px; scroll-margin-top:76px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">{cat.key}</h2><span style="font-size:14px; color:#6b7280;">{cat.sub}</span></div>
+        {items.map((p) => {
+          const colors = COLORSETS[p.colorSet] || [];
+          return (
+            <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06); margin-bottom:20px;">
+              <img src={p.image} alt={p.name} data-zoom data-full={p.image} style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
+              <div>
+                <div style="font-weight:800; font-size:21px; color:#1f2937;">{p.name}</div>
+                {p.desc && (<p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">{p.desc}</p>)}
+                {p.badges.length > 0 && (
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+                    {p.badges.map((b) => (<span style="font-size:13px; font-weight:600; color:#15803d; background:#d1fae5; padding:4px 11px; border-radius:999px;">{b}</span>))}
+                  </div>
+                )}
+                {p.feats.length > 0 && (
+                  <ul style="list-style:none; padding:0; margin:0 0 18px; display:grid; gap:8px;">
+                    {p.feats.map((f) => (<li style="padding-left:26px; position:relative; font-size:14.5px;"><span style="position:absolute; left:0; color:#16a34a; font-weight:800;">✓</span>{f}</li>))}
+                  </ul>
+                )}
+                {p.specs.length > 0 && (
+                  <table style="width:100%; border-collapse:collapse; border:1px solid #ecece6; border-radius:12px; overflow:hidden; font-size:14px;">
+                    {p.specs.map((s, i) => (
+                      <tr><th style={`text-align:left; width:34%; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px;${i < p.specs.length - 1 ? ' border-bottom:1px solid #ecece6;' : ''}`}>{s.label}</th><td style={`padding:10px 14px;${i < p.specs.length - 1 ? ' border-bottom:1px solid #ecece6;' : ''}`}>{s.value}</td></tr>
+                    ))}
+                  </table>
+                )}
+                {colors.length > 0 && (
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center;">
+                    <span style="font-size:13px; color:#6b7280; font-weight:600;">색상</span>
+                    {colors.map((c) => (
+                      <span style={`width:22px; height:22px; border-radius:6px; border:1px solid rgba(0,0,0,.12); background:${c === 'stripe' ? 'repeating-linear-gradient(45deg,#f4c400 0 5px,#1c1c1c 5px 10px)' : c};`}></span>
+                    ))}
+                  </div>
+                )}
+                {p.note && (<div style="background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:12px; padding:12px 16px; font-weight:600; font-size:13.5px; margin-top:14px;">{p.note}</div>)}
+              </div>
             </div>
-          )}
-          {p.note && (<div style="background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:12px; padding:12px 16px; font-weight:600; font-size:13.5px; margin-top:14px;">{p.note}</div>)}
-        </div>
-      </div>
-    ))}
-  </section>
-
-  <!-- ===== 마감재 ===== -->
-  <section id="finish" style="max-width:1080px; margin:0 auto; padding:36px 20px 10px; scroll-margin-top:76px;">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">마감재</h2><span style="font-size:14px; color:#6b7280;">타일·바닥 끝단 마감용 알루미늄</span></div>
-    <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06);">
-      <img src="/images/products/finish.jpg" alt="데코트림·프로파일" data-zoom data-full="/images/products/finish.jpg" style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
-      <div>
-        <div style="font-weight:800; font-size:21px; color:#1f2937;">데코트림 · 프로파일 외</div>
-        <p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">타일·바닥 재료분리대 및 끝단 마감용 알루미늄 마감재</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"><span style="font-size:13px; font-weight:600; color:#15803d; background:#d1fae5; padding:4px 11px; border-radius:999px;">재료분리대</span><span style="font-size:13px; font-weight:600; color:#15803d; background:#d1fae5; padding:4px 11px; border-radius:999px;">타일 마감재</span><span style="font-size:13px; font-weight:600; color:#15803d; background:#d1fae5; padding:4px 11px; border-radius:999px;">바닥 마감재</span></div>
-        <table style="width:100%; border-collapse:collapse; border:1px solid #ecece6; border-radius:12px; overflow:hidden; font-size:14px;">
-          <tr><th style="text-align:left; width:34%; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px; border-bottom:1px solid #ecece6;">데코트림</th><td style="padding:10px 14px; border-bottom:1px solid #ecece6;">3mm × 2400mm / 1900mm</td></tr>
-          <tr><th style="text-align:left; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px; border-bottom:1px solid #ecece6;">프로파일 · 죠인트</th><td style="padding:10px 14px; border-bottom:1px solid #ecece6;">3mm × 2400mm</td></tr>
-          <tr><th style="text-align:left; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px;">그 외</th><td style="padding:10px 14px;">카펫몰딩 · AL302 · 데코논슬립 A/B 등</td></tr>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 굽도리 ===== -->
-  <section id="skirting" style="max-width:1080px; margin:0 auto; padding:36px 20px 10px; scroll-margin-top:76px;">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">굽도리</h2><span style="font-size:14px; color:#6b7280;">벽·바닥 경계 걸레받이</span></div>
-    <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06);">
-      <img src="/images/products/skirting.jpg" alt="굽도리" data-zoom data-full="/images/products/skirting.jpg" style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
-      <div>
-        <div style="font-weight:800; font-size:21px; color:#1f2937;">월베이스 · 우드굽도리 · 무지굽도리</div>
-        <p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">본드·양면테이프 시공용 걸레받이. 호텔·빌딩·병원 복도 등에 적용.</p>
-        <table style="width:100%; border-collapse:collapse; border:1px solid #ecece6; border-radius:12px; overflow:hidden; font-size:14px;">
-          <tr><th style="text-align:left; width:34%; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px; border-bottom:1px solid #ecece6;">월베이스</th><td style="padding:10px 14px; border-bottom:1px solid #ecece6;">75/105mm × 2~3.2T (본드 시공)</td></tr>
-          <tr><th style="text-align:left; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px; border-bottom:1px solid #ecece6;">우드굽도리</th><td style="padding:10px 14px; border-bottom:1px solid #ecece6;">75mm · 다양한 우드 컬러 (양면테이프)</td></tr>
-          <tr><th style="text-align:left; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px;">무지굽도리</th><td style="padding:10px 14px;">75/100mm · 단색 (양면테이프)</td></tr>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 기타 부자재 ===== -->
-  <section id="etc" style="max-width:1080px; margin:0 auto; padding:36px 20px 20px; scroll-margin-top:76px;">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">기타 부자재</h2><span style="font-size:14px; color:#6b7280;">시공용 접착 부자재</span></div>
-    <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06);">
-      <img src="/images/products/sikaflex-11fc.jpg" alt="시카플렉스 11 FC" data-zoom data-full="/images/products/sikaflex-11fc.jpg" style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
-      <div>
-        <div style="font-weight:800; font-size:21px; color:#1f2937;">시카플렉스 11 FC</div>
-        <p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">습기경화용 1액형 폴리우레탄 접착제 — 강력한 접착력</p>
-        <ul style="list-style:none; padding:0; margin:0 0 16px; display:grid; gap:8px;">
-          <li style="padding-left:26px; position:relative; font-size:14.5px;"><span style="position:absolute; left:0; color:#16a34a; font-weight:800;">✓</span>논슬립 시공 및 공업용 강력 접착</li>
-          <li style="padding-left:26px; position:relative; font-size:14.5px;"><span style="position:absolute; left:0; color:#16a34a; font-weight:800;">✓</span>나무·금속 등 접착 및 씰링</li>
-        </ul>
-        <table style="width:100%; border-collapse:collapse; border:1px solid #ecece6; border-radius:12px; overflow:hidden; font-size:14px;">
-          <tr><th style="text-align:left; width:34%; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px; border-bottom:1px solid #ecece6;">규격</th><td style="padding:10px 14px; border-bottom:1px solid #ecece6;">20ctg × 310ml</td></tr>
-          <tr><th style="text-align:left; background:#ecfdf5; color:#15803d; font-weight:700; padding:10px 14px;">타입</th><td style="padding:10px 14px;">습기경화용 1액형 폴리우레탄</td></tr>
-        </table>
-      </div>
-    </div>
-  </section>
+          );
+        })}
+      </section>
+    );
+  })}
 
   <!-- BUY CTA -->
   <section style="max-width:1080px; margin:0 auto; padding:20px 20px 58px;">

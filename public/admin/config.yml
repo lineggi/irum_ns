@@ -28,9 +28,54 @@ collections:
     summary: '{{fields.order}}. {{fields.title}} — {{fields.note}}'
     sortable_fields: [order, title]
     fields:
-      - { name: image, label: 현장 사진, widget: image }
+      - { name: image, label: 현장 사진, widget: image, hint: '권장: 가로형 4:3, 가로 1200px 이상, JPG, 1MB 이하' }
       - { name: title, label: 제목, widget: string, default: 논슬립 시공 현장 }
       - { name: note, label: 설명, widget: string, default: 계단·경사로 미끄럼 방지 시공 }
+      - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
+
+  - name: products
+    label: 제품
+    label_singular: 제품
+    description: 제품 사진·규격·설명을 추가·수정·삭제합니다.
+    folder: src/content/products
+    create: true
+    delete: true
+    extension: md
+    format: frontmatter
+    identifier_field: name
+    slug: 'product-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}'
+    summary: '{{fields.order}}. [{{fields.category}}] {{fields.name}}'
+    sortable_fields: [order, category, name]
+    fields:
+      - { name: category, label: 분류, widget: select, options: [논슬립, 마감재, 굽도리, 기타], default: 논슬립 }
+      - { name: name, label: 제품명, widget: string }
+      - { name: desc, label: 한 줄 설명, widget: string, required: false }
+      - name: image
+        label: 제품 사진
+        widget: image
+        hint: '권장: 정사각형~4:3 비율, 가로 1000px 이상, JPG, 1MB 이하. 밝고 깔끔한 배경 추천.'
+      - name: badges
+        label: 태그 (선택)
+        widget: list
+        required: false
+        field: { name: text, label: 태그, widget: string }
+        hint: '초록색 알약 형태로 표시됩니다. 예) 재료분리대, 타일 마감재'
+      - name: feats
+        label: 특징 목록 (선택)
+        widget: list
+        required: false
+        field: { name: text, label: 특징, widget: string }
+        hint: '체크(✓) 표시로 나열됩니다.'
+      - name: specs
+        label: 규격표 (선택)
+        widget: list
+        required: false
+        summary: '{{fields.label}}: {{fields.value}}'
+        fields:
+          - { name: label, label: 항목, widget: string }
+          - { name: value, label: 내용, widget: string }
+      - { name: colorSet, label: 색상 견본, widget: select, options: [세라믹, 고무패드, 없음], default: 없음, hint: '제품 아래 표시할 색상 스와치 세트' }
+      - { name: note, label: 안내 문구 (선택), widget: text, required: false }
       - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
 
   - name: media
@@ -41,7 +86,7 @@ collections:
         label: 페이지 대표 이미지
         file: src/data/media.json
         fields:
-          - { name: home_hero, label: 홈 - 히어로 이미지, widget: image }
-          - { name: about_image, label: 회사소개 - 이미지, widget: image }
-          - { name: guide_stair, label: 시공가이드 - 계단 논슬립 이미지, widget: image }
-          - { name: guide_finish, label: 시공가이드 - 마감재 이미지, widget: image }
+          - { name: home_hero, label: 홈 - 히어로 이미지, widget: image, hint: '권장: 가로형 3:2, 가로 1600px 이상, JPG, 1.5MB 이하 (첫 화면 큰 사진)' }
+          - { name: about_image, label: 회사소개 - 이미지, widget: image, hint: '권장: 가로형 4:3, 가로 1200px 이상, JPG, 1MB 이하' }
+          - { name: guide_stair, label: 시공가이드 - 계단 논슬립 이미지, widget: image, hint: '권장: 가로형 4:3, 가로 1200px 이상, JPG, 1MB 이하' }
+          - { name: guide_finish, label: 시공가이드 - 마감재 이미지, widget: image, hint: '권장: 가로형 4:3, 가로 1200px 이상, JPG, 1MB 이하' }

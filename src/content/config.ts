@@ -11,4 +11,21 @@ const cases = defineCollection({
   }),
 });
 
-export const collections = { cases };
+// 제품 — 어드민에서 추가·수정·삭제하는 폴더 컬렉션 (src/content/products/*.md)
+const products = defineCollection({
+  type: 'content',
+  schema: z.object({
+    category: z.enum(['논슬립', '마감재', '굽도리', '기타']).default('논슬립'),
+    name: z.string(),
+    desc: z.string().default(''),
+    image: z.string(),
+    badges: z.array(z.string()).default([]),
+    feats: z.array(z.string()).default([]),
+    specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    colorSet: z.enum(['세라믹', '고무패드', '없음']).default('없음'),
+    note: z.string().default(''),
+    order: z.number().default(100),
+  }),
+});
+
+export const collections = { cases, products };

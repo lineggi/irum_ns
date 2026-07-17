@@ -5,9 +5,10 @@ backend:
   # GitHub OAuth 인증용 백엔드 주소 (sveltia-cms-auth Cloudflare 워커)
   base_url: https://sveltia-cms-auth.soon218208.workers.dev
 
-# 새로 업로드하는 이미지 저장 위치
-media_folder: public/images/uploads
-public_folder: /images/uploads
+# 이미지 저장/인식 위치. /images 전체를 대상으로 해야 기존 사진(guide·cases 등)
+# 미리보기가 어드민에서 정상 표시됩니다. 새 업로드도 이 폴더에 저장됩니다.
+media_folder: public/images
+public_folder: /images
 
 # 한국어 UI
 locale: ko

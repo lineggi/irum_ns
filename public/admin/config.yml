@@ -65,16 +65,25 @@ collections:
         widget: list
         required: false
         field: { name: text, label: 특징, widget: string }
-        hint: '체크(✓) 표시로 나열됩니다.'
+        hint: 'Add 버튼으로 한 줄씩 추가하세요. 각 항목 앞에 ✓가 자동으로 붙습니다. (✓는 직접 입력하지 마세요)'
       - name: specs
-        label: 규격표 (선택)
+        label: 규격표
         widget: list
         required: false
         summary: '{{fields.label}}: {{fields.value}}'
+        hint: '기존 제품과 동일하게 규격·재질 순서로 채워주세요. 필요하면 행을 추가/삭제할 수 있습니다.'
+        default:
+          - { label: 규격, value: '' }
+          - { label: 재질, value: '' }
         fields:
           - { name: label, label: 항목, widget: string }
           - { name: value, label: 내용, widget: string }
-      - { name: colorSet, label: 색상 견본, widget: select, options: [세라믹, 고무패드, 없음], default: 없음, hint: '제품 아래 표시할 색상 스와치 세트' }
+      - name: colors
+        label: 색상 견본 (선택)
+        widget: list
+        required: false
+        field: { name: color, label: 색상, widget: color, enableAlpha: false, allowInput: true }
+        hint: 'Add 버튼으로 색을 추가하고, 색상 상자를 눌러 RGB/HEX로 원하는 색을 고르세요. 제품 아래 견본으로 표시됩니다.'
       - { name: note, label: 안내 문구 (선택), widget: text, required: false }
       - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
 

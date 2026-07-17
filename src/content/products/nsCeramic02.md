@@ -12,6 +12,12 @@ specs:
     value: 폭 75mm(W) × 높이 25mm(H)
   - label: 두께
     value: 2mm 초슬립형
-colorSet: 세라믹
+colors:
+  - '#d7d2c7'
+  - '#9aa0a6'
+  - '#2b2b2b'
+  - '#f4c400'
+  - '#2e7d32'
+  - '#6d3b2a'
 order: 3
 ---

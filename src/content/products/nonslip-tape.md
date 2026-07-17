@@ -12,6 +12,12 @@ specs:
     value: 폭 50mm × 길이 30m / 15m
   - label: 재질
     value: 세라믹(암석입자)
-colorSet: 세라믹
+colors:
+  - '#d7d2c7'
+  - '#9aa0a6'
+  - '#2b2b2b'
+  - '#f4c400'
+  - '#2e7d32'
+  - '#6d3b2a'
 order: 1
 ---

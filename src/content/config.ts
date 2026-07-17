@@ -20,9 +20,9 @@ const products = defineCollection({
     desc: z.string().default(''),
     image: z.string(),
     badges: z.array(z.string()).default([]),
-    feats: z.array(z.string()).default([]),
+    feats: z.array(z.string()).default([]), // 특징 목록 (각 항목 앞에 ✓ 자동 표시)
     specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
-    colorSet: z.enum(['세라믹', '고무패드', '없음']).default('없음'),
+    colors: z.array(z.string()).default([]),
     note: z.string().default(''),
     order: z.number().default(100),
   }),

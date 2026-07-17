@@ -2,3 +2,6 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.irumns.com/sitemap.xml
+
+# 어드민은 검색 제외
+Disallow: /admin/

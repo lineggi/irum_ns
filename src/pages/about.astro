@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site.js';
+import media from '../data/media.json';
 const b = site.business;
 ---
 
@@ -21,7 +22,7 @@ const b = site.business;
         <h2 style="font-size:28px; font-weight:800; letter-spacing:-.02em; margin:8px 0 14px;">미끄럼 걱정 없이,<br />안심하는 일상</h2>
         <p style="font-size:15.5px; color:#4b5563; line-height:1.8;">계단·현관·경사로의 작은 미끄러짐은 큰 사고로 이어집니다. 이룸엔에스는 국내에서 생산한 튼튼한 논슬립과 현장에서 쌓은 시공 노하우로, 가정부터 건물까지 오래가는 안전을 제공합니다. 개인 구매자도 혼자 시공할 수 있도록 쉬운 가이드까지 함께 드립니다.</p>
       </div>
-      <img src="/images/cases/case004.jpg" alt="시공 현장" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:22px; box-shadow:0 18px 40px rgba(31,41,55,.14);" />
+      <img src={media.about_image} alt="시공 현장" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:22px; box-shadow:0 18px 40px rgba(31,41,55,.14);" />
     </div>
   </section>
 

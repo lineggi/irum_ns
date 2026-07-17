@@ -1,6 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { cases } from '../../data/content.js';
+import { getCollection } from 'astro:content';
+
+const cases = (await getCollection('cases'))
+  .map((c) => ({ img: c.data.image, title: c.data.title, note: c.data.note, order: c.data.order ?? 100 }))
+  .sort((a, b) => a.order - b.order);
 ---
 
 <BaseLayout title="시공사례" active="/cases/" description="아파트 계단·상가 경사로 등 이룸엔에스가 직접 시공한 논슬립 현장 사진을 확인하세요.">

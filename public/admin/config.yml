@@ -1,0 +1,47 @@
+backend:
+  name: github
+  repo: lineggi/irum_ns
+  branch: main
+  # GitHub OAuth 인증용 백엔드 주소. 아래 handoff 안내대로 sveltia-cms-auth 워커를 배포한 뒤
+  # 그 주소로 바꾸세요. (예: https://auth.irumns.com 또는 워커 URL)
+  base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev
+
+# 새로 업로드하는 이미지 저장 위치
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+# 한국어 UI
+locale: ko
+
+collections:
+  - name: cases
+    label: 시공사례
+    label_singular: 시공사례
+    description: 시공 현장 사진과 설명을 추가·수정·삭제합니다.
+    folder: src/content/cases
+    create: true
+    delete: true
+    extension: md
+    format: frontmatter
+    identifier_field: title
+    slug: 'case-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}'
+    summary: '{{fields.order}}. {{fields.title}} — {{fields.note}}'
+    sortable_fields: [order, title]
+    fields:
+      - { name: image, label: 현장 사진, widget: image }
+      - { name: title, label: 제목, widget: string, default: 논슬립 시공 현장 }
+      - { name: note, label: 설명, widget: string, default: 계단·경사로 미끄럼 방지 시공 }
+      - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
+
+  - name: media
+    label: 페이지 이미지
+    description: 각 페이지의 대표 이미지를 교체합니다.
+    files:
+      - name: page_images
+        label: 페이지 대표 이미지
+        file: src/data/media.json
+        fields:
+          - { name: home_hero, label: 홈 - 히어로 이미지, widget: image }
+          - { name: about_image, label: 회사소개 - 이미지, widget: image }
+          - { name: guide_stair, label: 시공가이드 - 계단 논슬립 이미지, widget: image }
+          - { name: guide_finish, label: 시공가이드 - 마감재 이미지, widget: image }

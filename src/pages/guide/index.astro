@@ -2,6 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { site } from '../../data/site.js';
 import { guides } from '../../data/content.js';
+import media from '../../data/media.json';
+
+// 가이드 이미지는 media.json으로 CMS 관리 (슬러그별 매핑)
+const guideImg = { 'stair-diy': media.guide_stair, 'finish-trim': media.guide_finish };
 ---
 
 <BaseLayout title="시공가이드" active="/guide/" description="계단 논슬립·마감재 셀프 시공 방법을 단계별로. 공구만 있으면 초보자도 30분이면 완성.">
@@ -16,7 +20,7 @@ import { guides } from '../../data/content.js';
   {guides.map((g) => (
     <section id={g.slug} style="max-width:1080px; margin:0 auto; padding:44px 20px 10px; scroll-margin-top:76px;">
       <div class="guide-head" style="display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:center; background:#fff; border:1px solid #ecece6; border-radius:22px; overflow:hidden; box-shadow:0 6px 20px rgba(31,41,55,.06);">
-        <img src={g.img} alt={g.title} style="width:100%; height:100%; object-fit:cover; min-height:260px;" />
+        <img src={guideImg[g.slug] || g.img} alt={g.title} style="width:100%; height:100%; object-fit:cover; min-height:260px;" />
         <div style="padding:30px 30px 30px 6px;">
           <div style="display:flex; gap:8px; margin-bottom:12px;"><span style="font-size:13px; font-weight:600; color:#15803d; background:#d1fae5; padding:4px 11px; border-radius:999px;">{g.level}</span><span style="font-size:13px; font-weight:600; color:#9a3412; background:#fff7ed; border:1px solid #fed7aa; padding:4px 11px; border-radius:999px;">약 {g.minutes}분</span></div>
           <h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0 0 8px;">{g.title}</h2>

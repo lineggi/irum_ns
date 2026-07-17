@@ -2,9 +2,8 @@ backend:
   name: github
   repo: lineggi/irum_ns
   branch: main
-  # GitHub OAuth 인증용 백엔드 주소. 아래 handoff 안내대로 sveltia-cms-auth 워커를 배포한 뒤
-  # 그 주소로 바꾸세요. (예: https://auth.irumns.com 또는 워커 URL)
-  base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev
+  # GitHub OAuth 인증용 백엔드 주소 (sveltia-cms-auth Cloudflare 워커)
+  base_url: https://sveltia-cms-auth.soon218208.workers.dev
 
 # 새로 업로드하는 이미지 저장 위치
 media_folder: public/images/uploads

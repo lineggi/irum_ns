@@ -46,6 +46,10 @@ collections:
     slug: 'product-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}'
     summary: '{{fields.order}}. [{{fields.category}}] {{fields.name}}'
     sortable_fields: [order, category, name]
+    # Sveltia CMS는 실제 사이트와 동일한 커스텀 프리뷰(registerPreviewTemplate)를 아직 지원하지 않음.
+    # 기본 프리뷰는 실제 화면과 달라 혼란을 주므로 끄고, 저장 후 실제 사이트에서 확인.
+    editor:
+      preview: false
     fields:
       - { name: category, label: 분류, widget: select, options: [논슬립, 마감재, 굽도리, 기타], default: 논슬립 }
       - { name: name, label: 제품명, widget: string }
@@ -78,12 +82,32 @@ collections:
         fields:
           - { name: label, label: 항목, widget: string }
           - { name: value, label: 내용, widget: string }
+      - name: presetColors
+        label: 색상 - 기존 색상에서 선택
+        widget: select
+        multiple: true
+        required: false
+        hint: '기존 제품에서 쓰던 색을 골라 담으세요. 여러 개 선택 가능.'
+        options:
+          - { label: 밝은 베이지, value: '#d7d2c7' }
+          - { label: 그레이, value: '#9aa0a6' }
+          - { label: 다크그레이, value: '#2b2b2b' }
+          - { label: 옐로우, value: '#f4c400' }
+          - { label: 그린, value: '#2e7d32' }
+          - { label: 브라운, value: '#6d3b2a' }
+          - { label: 딥그린, value: '#1f5e3a' }
+          - { label: 네이비, value: '#23305e' }
+          - { label: 블랙, value: '#222222' }
+          - { label: 골드옐로우, value: '#e0b400' }
+          - { label: 레드, value: '#9e2b25' }
+          - { label: 다크브라운, value: '#5b3b2e' }
+          - { label: 실버그레이, value: '#8a8f98' }
       - name: colors
-        label: 색상 견본 (선택)
+        label: 색상 - 직접 색 추가 (RGB)
         widget: list
         required: false
         field: { name: color, label: 색상, widget: color, enableAlpha: false, allowInput: true }
-        hint: 'Add 버튼으로 색을 추가하고, 색상 상자를 눌러 RGB/HEX로 원하는 색을 고르세요. 제품 아래 견본으로 표시됩니다.'
+        hint: '팔레트에 없는 색은 여기서 Add → 색상 상자를 눌러 RGB/HEX로 직접 추가하세요.'
       - { name: note, label: 안내 문구 (선택), widget: text, required: false }
       - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
 

@@ -68,7 +68,7 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
       <section id={cat.id} style="max-width:1080px; margin:0 auto; padding:46px 20px 10px; scroll-margin-top:76px;">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;"><span style="width:8px; height:26px; border-radius:4px; background:#16a34a;"></span><h2 style="font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0;">{cat.key}</h2><span style="font-size:14px; color:#6b7280;">{cat.sub}</span></div>
         {items.map((p) => {
-          const colors = p.colors || [];
+          const colors = [...new Set([...(p.presetColors || []), ...(p.colors || [])])];
           return (
             <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06); margin-bottom:20px;">
               <img src={p.image} alt={p.name} data-zoom data-full={p.image} style="width:100%; border-radius:16px; border:1px solid #ecece6;" />

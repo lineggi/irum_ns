@@ -19,11 +19,8 @@ const products = defineCollection({
     name: z.string(),
     desc: z.string().default(''),
     image: z.string(),
-    badges: z.array(z.string()).default([]),
-    feats: z.array(z.string()).default([]), // 특징 목록 (각 항목 앞에 ✓ 자동 표시)
     specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
-    presetColors: z.array(z.string()).default([]), // 기존 색상 팔레트에서 선택
-    colors: z.array(z.string()).default([]), // 직접 추가한 RGB 색상
+    colors: z.array(z.string()).default([]), // 색상 견본 이미지 경로 목록
     note: z.string().default(''),
     order: z.number().default(100),
   }),

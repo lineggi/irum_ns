@@ -46,10 +46,6 @@ collections:
     slug: 'product-{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}'
     summary: '{{fields.order}}. [{{fields.category}}] {{fields.name}}'
     sortable_fields: [order, category, name]
-    # Sveltia CMS는 실제 사이트와 동일한 커스텀 프리뷰(registerPreviewTemplate)를 아직 지원하지 않음.
-    # 기본 프리뷰는 실제 화면과 달라 혼란을 주므로 끄고, 저장 후 실제 사이트에서 확인.
-    editor:
-      preview: false
     fields:
       - { name: category, label: 분류, widget: select, options: [논슬립, 마감재, 굽도리, 기타], default: 논슬립 }
       - { name: name, label: 제품명, widget: string }
@@ -58,18 +54,6 @@ collections:
         label: 제품 사진
         widget: image
         hint: '권장: 정사각형~4:3 비율, 가로 1000px 이상, JPG, 1MB 이하. 밝고 깔끔한 배경 추천.'
-      - name: badges
-        label: 태그 (선택)
-        widget: list
-        required: false
-        field: { name: text, label: 태그, widget: string }
-        hint: '초록색 알약 형태로 표시됩니다. 예) 재료분리대, 타일 마감재'
-      - name: feats
-        label: 특징 목록 (선택)
-        widget: list
-        required: false
-        field: { name: text, label: 특징, widget: string }
-        hint: 'Add 버튼으로 한 줄씩 추가하세요. 각 항목 앞에 ✓가 자동으로 붙습니다. (✓는 직접 입력하지 마세요)'
       - name: specs
         label: 규격표
         widget: list
@@ -82,32 +66,12 @@ collections:
         fields:
           - { name: label, label: 항목, widget: string }
           - { name: value, label: 내용, widget: string }
-      - name: presetColors
-        label: 색상 - 기존 색상에서 선택
-        widget: select
-        multiple: true
-        required: false
-        hint: '기존 제품에서 쓰던 색을 골라 담으세요. 여러 개 선택 가능.'
-        options:
-          - { label: 밝은 베이지, value: '#d7d2c7' }
-          - { label: 그레이, value: '#9aa0a6' }
-          - { label: 다크그레이, value: '#2b2b2b' }
-          - { label: 옐로우, value: '#f4c400' }
-          - { label: 그린, value: '#2e7d32' }
-          - { label: 브라운, value: '#6d3b2a' }
-          - { label: 딥그린, value: '#1f5e3a' }
-          - { label: 네이비, value: '#23305e' }
-          - { label: 블랙, value: '#222222' }
-          - { label: 골드옐로우, value: '#e0b400' }
-          - { label: 레드, value: '#9e2b25' }
-          - { label: 다크브라운, value: '#5b3b2e' }
-          - { label: 실버그레이, value: '#8a8f98' }
       - name: colors
-        label: 색상 - 직접 색 추가 (RGB)
+        label: 색상 견본
         widget: list
         required: false
-        field: { name: color, label: 색상, widget: color, enableAlpha: false, allowInput: true }
-        hint: '팔레트에 없는 색은 여기서 Add → 색상 상자를 눌러 RGB/HEX로 직접 추가하세요.'
+        field: { name: swatch, label: 색상 이미지, widget: image }
+        hint: 'Add를 눌러 색상 견본 이미지를 선택하세요. images/swatches 폴더에 기본 색상 이미지(베이지·그레이·검정·블랙·노랑·초록 등)가 준비되어 있고, 새 색상은 이미지를 올려 추가할 수 있습니다.'
       - { name: note, label: 안내 문구 (선택), widget: text, required: false }
       - { name: order, label: '정렬 순서 (작을수록 먼저)', widget: number, default: 100, value_type: int }
 

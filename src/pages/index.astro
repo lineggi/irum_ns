@@ -10,8 +10,8 @@ const previewCases = (await getCollection('cases'))
 
 // 주요 납품 실적 (임팩트 큰 기관 우선). marquee로 흐르게 표시.
 const clients = [
-  '주한 캐나다 대사관', '울산과학기술원(UNIST)', '백석예술대학교', '충남대학교', '한림대학교',
-  '하남 보바스병원', '강원 원주의료원', '순천 동부종합청사', '이천보건소',
+  '주한 캐*다 대사관', '울산과학기술원(UNIST)', '백석예술대학교', '충남대학교', '한림대학교',
+  '하남 보*스병원', '강원 원*의료원', '순천 동부종합청사', '이천보건소',
   '숭실고등학교', '선일빅데이터고등학교', '세곡초등학교', '구포초등학교', '용인 대지초등학교',
   '오금초등학교', '의왕 오천초등학교', '안성 용머리초등학교', '수원 매교초등학교', '군포 궁내중학교',
   '경기남부직업능력개발원', '양주 북부유아체험관', '화성 향남복합커뮤니티센터',
@@ -101,7 +101,7 @@ const clients = [
         {[...clients, ...clients].map((c) => (<span class="chip">{c}</span>))}
       </div>
     </div>
-    <p style="max-width:1080px; margin:0 auto; padding:0 20px 40px; text-align:center; font-size:13px; color:#9aa197;">그 외 다수 학교·관공서·건설 현장</p>
+    <p style="max-width:1080px; margin:0 auto; padding:0 20px 40px; text-align:center; font-size:13px; color:#9aa197; line-height:1.6;">그 외 다수 학교·관공서·건설 현장<br />상기 목록은 납품 실적이며, 해당 기관의 추천·제휴를 의미하지 않습니다.</p>
   </section>
 
   <!-- ===== 시공가이드 BAND ===== -->

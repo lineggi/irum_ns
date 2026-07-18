@@ -12,7 +12,7 @@ specs:
     value: 폭 57mm(W) × 높이 27mm(H)
   - label: 재질
     value: 알루미늄 + 고무 패드
-colors:
+presetColors:
   - '#1f5e3a'
   - '#23305e'
   - '#222222'

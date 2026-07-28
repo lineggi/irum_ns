@@ -71,8 +71,8 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
           const colors = [...new Set([...(p.presetColors || []), ...(p.colors || [])])];
           return (
             <div class="prod-detail" style="display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; background:#fff; border:1px solid #ecece6; border-radius:22px; padding:24px; box-shadow:0 6px 20px rgba(31,41,55,.06); margin-bottom:20px;">
-              <img src={p.image} alt={p.name} data-zoom data-full={p.image} style="width:100%; border-radius:16px; border:1px solid #ecece6;" />
-              <div>
+              <img src={p.image} alt={p.name} data-zoom data-full={p.image} style="width:100%; border-radius:16px; border:1px solid #ecece6; align-self:start;" />
+              <div style="display:flex; flex-direction:column; justify-content:center;">
                 <div style="font-weight:800; font-size:21px; color:#1f2937;">{p.name}</div>
                 {p.desc && (<p style="font-size:15px; color:#4b5563; margin:6px 0 16px;">{p.desc}</p>)}
                 {p.specs.length > 0 && (
@@ -91,6 +91,10 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
                   </div>
                 )}
                 {p.note && (<div style="background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:12px; padding:12px 16px; font-weight:600; font-size:13.5px; margin-top:14px;">{p.note}</div>)}
+                <div style="margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                  <a href={site.storeUrl} target="_blank" rel="noopener" class="prod-buy">스마트스토어에서 보기 →</a>
+                  <span style="font-size:12.5px; color:#9aa197;">가격·재고는 스토어에서 확인</span>
+                </div>
               </div>
             </div>
           );
@@ -108,8 +112,17 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
     </div>
   </section>
 
+  <button id="to-top" class="to-top" aria-label="맨 위로" title="맨 위로">↑</button>
+
   <script is:inline>
     (function () {
+      var btn = document.getElementById('to-top');
+      if (btn) {
+        var onScroll = function () { btn.classList.toggle('show', window.scrollY > 700); };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      }
       var steps = document.getElementById('calc-steps');
       var width = document.getElementById('calc-width');
       var unit = document.getElementById('calc-unit');
@@ -141,9 +154,15 @@ const byCat = (key) => allProducts.filter((p) => p.category === key);
   .calc-in:focus { outline: none; border-color: #16a34a; background: #fff; }
   .catcard { transition: transform .12s ease, box-shadow .12s ease; }
   .catcard:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(31, 41, 55, .1); border-color: #16a34a; }
+  .prod-buy { display: inline-flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14.5px; color: #fff; background: #f97316; box-shadow: 0 6px 16px rgba(249, 115, 22, .28); transition: background .15s ease, transform .12s ease; }
+  .prod-buy:hover { background: #ea580c; transform: translateY(-1px); }
+  .to-top { position: fixed; right: 18px; bottom: 24px; width: 46px; height: 46px; border-radius: 50%; background: #16a34a; color: #fff; border: none; box-shadow: 0 8px 20px rgba(31, 41, 55, .22); font-size: 20px; line-height: 46px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 60; }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+  .to-top:hover { background: #15803d; }
   @media (max-width: 820px) {
     .prod-detail { grid-template-columns: 1fr !important; }
     .cat-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .calc-grid { grid-template-columns: 1fr !important; }
+    .to-top { bottom: 86px; }
   }
 </style>

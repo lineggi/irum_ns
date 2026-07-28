@@ -67,7 +67,7 @@ const ogImageUrl = site.ogImage ? new URL(site.ogImage, Astro.site).href : undef
   <body>
     <header class="site-header">
       <div class="container bar">
-        <a class="brand" href="/"><img class="brand-mark" src="/images/logo-mark.png" alt="" width="34" height="34" />이룸<span style="color:#16a34a">NS</span></a>
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="8" fill="#16a34a"/><rect x="6" y="20" width="20" height="3.4" rx="1.2" fill="#fff"/><rect x="10" y="14.6" width="16" height="3.4" rx="1.2" fill="#fff"/><rect x="14" y="9.2" width="12" height="3.4" rx="1.2" fill="#f4c400"/></svg></span>이룸<span style="color:#16a34a">NS</span></a>
         <nav class="gnb" aria-label="주요 메뉴">
           {nav.map((item) => (
             <a href={item.href} aria-current={active === item.href ? 'page' : undefined}>{item.label}</a>

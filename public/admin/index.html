@@ -9,5 +9,22 @@
   <body>
     <!-- Sveltia CMS (Decap 호환). config.yml 설정을 읽어 관리자 UI를 렌더링 -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+
+    <!-- 계단 실측 → 엑셀 도구로 가는 고정 링크 (Sveltia SPA가 DOM을 갱신해도 유지) -->
+    <script>
+      (function () {
+        function addLink() {
+          if (document.getElementById('stair-tool-link')) return;
+          var a = document.createElement('a');
+          a.id = 'stair-tool-link';
+          a.href = '/admin/stair-tool.html';
+          a.textContent = '📐 계단 실측 → 엑셀';
+          a.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:99999;background:#2C5F8A;color:#fff;font:600 13px/1 system-ui,-apple-system,sans-serif;padding:11px 15px;border-radius:8px;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.22);';
+          (document.body || document.documentElement).appendChild(a);
+        }
+        addLink();
+        new MutationObserver(addLink).observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
   </body>
 </html>

@@ -234,8 +234,8 @@
     <div class="keyrow">
       <label for="modelSel">인식 모델</label>
       <select id="modelSel" style="padding:8px 10px; border:1.5px solid var(--line); border-radius:5px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink);">
-        <option value="gemini-2.5-flash">Flash — 무료·빠름 (기본)</option>
-        <option value="gemini-2.5-pro">Pro — 정확·유료 (지저분한 필기용)</option>
+        <option value="flash">Flash — 무료·빠름 (기본)</option>
+        <option value="pro">Pro — 정확·유료 (지저분한 필기용)</option>
       </select>
       <span class="hint" style="margin:0;">필기가 흐리거나 오독이 잦으면 Pro로 바꿔 다시 인식하세요.</span>
     </div>
@@ -275,15 +275,15 @@
 /* ===================== 설정 ===================== */
 // 손글씨 인식은 이룸NS 서버 함수(/api/recognize)를 통해 Google Gemini로 요청한다.
 // API 키는 서버(Vercel 환경변수)에만 있고 브라우저에는 없다.
-const MODEL_STORE = 'irumns_gemini_model';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const MODEL_STORE = 'irumns_gemini_tier';
+const DEFAULT_TIER = 'flash';
 const RECOGNIZE_ENDPOINT = '/api/recognize';
 
-/* ===================== 모델 선택 관리 ===================== */
-function getModel(){ try{ return localStorage.getItem(MODEL_STORE) || DEFAULT_MODEL; }catch(e){ return DEFAULT_MODEL; } }
+/* ===================== 모델(tier) 선택 관리 ===================== */
+function getTier(){ try{ return localStorage.getItem(MODEL_STORE) || DEFAULT_TIER; }catch(e){ return DEFAULT_TIER; } }
 function initKeyBar(){
   const modelSel = document.getElementById('modelSel');
-  modelSel.value = getModel();
+  modelSel.value = getTier();
   modelSel.addEventListener('change', ()=>{ try{ localStorage.setItem(MODEL_STORE, modelSel.value); }catch(e){} });
 }
 
@@ -508,14 +508,14 @@ async function recognizeHandwriting(){
   sc.images.forEach(img=>{
     parts.push({inline_data:{mime_type: img.mediaType, data: img.base64}});
   });
-  const model = getModel();
+  const tier = getTier();
 
   try{
     const response = await fetch(RECOGNIZE_ENDPOINT, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
-        model,
+        tier,
         contents: [{role:"user", parts}],
         generationConfig: { temperature: 0, responseMimeType: "application/json" }
       })

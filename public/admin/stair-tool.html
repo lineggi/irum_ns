@@ -505,6 +505,16 @@ async function handleImageUpload(e){
   e.target.value = '';
 }
 
+/* ===================== 손글씨 표기 → 실제 mm 변환 =====================
+   현장 표기 규칙: 1000 미만으로 적힌 값은 뒤 0이 생략된 것(×10).
+   예) 152 → 1520,  138.3 → 1383,  이미 네 자리(1755)면 그대로. */
+function normalizeMm(v){
+  if(v==null || v==='') return '';
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g,''));
+  if(isNaN(n)) return (typeof v==='string' ? v : '');
+  return n < 1000 ? Math.round(n*10) : Math.round(n);
+}
+
 /* ===================== 손글씨 인식 (서버 함수 → Gemini) ===================== */
 async function recognizeHandwriting(){
   const sc = getActive();
@@ -540,7 +550,7 @@ async function recognizeHandwriting(){
 
 규칙:
 - values의 키는 반드시 위에서 지정한 층 컬럼 이름을 그대로 사용하세요.
-- 숫자만 추출하고 단위(mm)는 붙이지 마세요.
+- 숫자는 손글씨에 적힌 "그대로" 추출하세요. 세 자리 수나 소수점이 있는 값(예: 152, 138.3)도 임의로 0을 붙이거나 변환하지 말고 적힌 그대로 쓰세요. 소수점이 있으면 소수점도 포함하세요. (실제 치수 변환은 앱에서 자동으로 처리합니다.)
 - 칸이 비어있거나 손글씨를 판독할 수 없으면 그 층 값은 null로 표기하세요.
 - '구분'은 사진에 적힌 그대로(상/중/하 등) 옮기세요.
 - 번호는 사진에 적힌 순번을 정수로 옮기세요.
@@ -593,7 +603,7 @@ async function recognizeHandwriting(){
         구분: r.구분 ?? '',
         번호: r.번호 ?? '',
         box, img, crop: '',
-        values: sc.floors.reduce((acc,f)=>{ acc[f] = (r.values && r.values[f]!=null) ? r.values[f] : ''; return acc; }, {})
+        values: sc.floors.reduce((acc,f)=>{ const raw=(r.values && r.values[f]!=null) ? r.values[f] : ''; acc[f] = raw===''?'':normalizeMm(raw); return acc; }, {})
       };
     });
 
@@ -686,7 +696,7 @@ function renderTable(){
     <table class="datatable"><thead>${thead}</thead><tbody>${tbody}</tbody></table>
     <div class="tablefoot">
       <button class="ghost" id="addRow">+ 행 추가</button>
-      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'}</span>
+      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'} 값은 실제 mm입니다(현장 표기 152·138.3 → 1520·1383 자동 변환).</span>
     </div>
   `;
 

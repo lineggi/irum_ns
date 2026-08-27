@@ -478,8 +478,13 @@ async function recognizeHandwriting(){
     return;
   }
   statusEl.className='status loading';
-  statusEl.textContent='인식 중입니다... (사진 수에 따라 10~30초 소요)';
+  statusEl.textContent='인식 중입니다... (보통 10~40초)';
   document.getElementById('recognizeBtn').disabled = true;
+  const _t0 = Date.now();
+  const _tick = setInterval(()=>{
+    const s = Math.round((Date.now()-_t0)/1000);
+    statusEl.textContent = '인식 중입니다... (' + s + '초 경과)';
+  }, 1000);
 
   const floorList = sc.floors.join(', ');
   const promptText = `당신은 계단 단(디딤판) 실측 손글씨 기록표를 디지털화하는 전문가입니다.
@@ -510,10 +515,14 @@ async function recognizeHandwriting(){
   });
   const tier = getTier();
 
+  const _controller = new AbortController();
+  const _timeout = setTimeout(()=>_controller.abort(), 150000); // 150초 안전 타임아웃
+
   try{
     const response = await fetch(RECOGNIZE_ENDPOINT, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
+      signal: _controller.signal,
       body: JSON.stringify({
         tier,
         contents: [{role:"user", parts}],
@@ -550,8 +559,14 @@ async function recognizeHandwriting(){
     renderSummary();
   }catch(err){
     statusEl.className='status error';
-    statusEl.textContent = '인식 실패: ' + err.message + ' — 다시 시도하거나 사진을 더 선명하게 다시 올려주세요.';
+    if(err && err.name==='AbortError'){
+      statusEl.textContent = '인식 실패: 시간 초과(150초). 사진 장수를 줄이거나(1~2장), 잠시 후 다시 시도해주세요.';
+    }else{
+      statusEl.textContent = '인식 실패: ' + (err && err.message ? err.message : err) + ' — 다시 시도하거나 사진을 더 선명하게 다시 올려주세요.';
+    }
   }finally{
+    clearInterval(_tick);
+    clearTimeout(_timeout);
     document.getElementById('recognizeBtn').disabled = false;
   }
 }

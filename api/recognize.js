@@ -6,6 +6,7 @@
 //   Name: GEMINI_API_KEY   Value: (aistudio.google.com/apikey 에서 발급한 키)
 // 를 추가하고 재배포하면 활성화된다.
 
+// v1 — 최신 배포 강제용 마커
 const ALLOWED_MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro'];
 
 export default async function handler(req, res) {

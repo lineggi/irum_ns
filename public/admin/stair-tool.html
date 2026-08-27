@@ -111,6 +111,12 @@
     padding:2px 0; border-bottom:1px solid transparent;
   }
   .titleblock input:focus{border-bottom:1px solid var(--blue);}
+  .titleblock select{
+    width:100%; border:none; outline:none; background:transparent; cursor:pointer;
+    font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--ink);
+    padding:2px 0; border-bottom:1px solid transparent;
+  }
+  .titleblock select:focus{border-bottom:1px solid var(--blue);}
   .titleblock .wide{grid-column:span 2;}
   .epoxycheck{margin-top:6px;}
   .epoxycheck .chk{
@@ -207,6 +213,13 @@
   }
   .summarygrid{display:flex; gap:28px; flex-wrap:wrap; font-family:'IBM Plex Mono', monospace; font-size:13px;}
   .summarygrid .item b{display:block; font-size:20px; color:var(--blue-dark); margin-top:2px;}
+  .dimtable{width:100%; max-width:520px; border-collapse:collapse; margin-top:18px; font-family:'IBM Plex Mono', monospace; font-size:13px;}
+  .dimtable th{background:var(--ink); color:#fff; padding:7px 12px; text-align:right; font-weight:600; font-size:12px;}
+  .dimtable th:first-child{text-align:left;}
+  .dimtable td{border:1px solid var(--line); padding:6px 12px; text-align:right;}
+  .dimtable td:first-child{text-align:left; font-weight:600;}
+  .dimtable tr:nth-child(even) td{background:#FBFAF7;}
+  .dimtable .dimtotal td{background:#EAF1F6; font-weight:700; color:var(--blue-dark); border-top:2px solid var(--ink);}
   .match-ok{color:var(--green); font-weight:700;}
   .match-bad{color:var(--red); font-weight:700;}
 
@@ -246,7 +259,18 @@
 
   <div class="titleblock" id="titleblock">
     <div class="cell wide"><label>장소</label><input type="text" id="meta_장소" placeholder="예: 안양 연성대학교 창조관"></div>
-    <div class="cell"><label>품목</label><input type="text" id="meta_품목" placeholder="예: 세라믹 62"></div>
+    <div class="cell"><label>품목</label>
+      <select id="meta_품목">
+        <option value="">— 선택 —</option>
+        <option>세라믹 논슬립 테이프</option>
+        <option>세라믹 각 논슬립 62</option>
+        <option>세라믹 각 논슬립 75</option>
+        <option>알루미늄 논슬립 AL 60-S</option>
+        <option>알루미늄 논슬립 AL 601-1</option>
+        <option>알루미늄 논슬립 AL 507</option>
+        <option>기타</option>
+      </select>
+    </div>
     <div class="cell"><label>색상</label><input type="text" id="meta_색상" placeholder="예: 회색"></div>
     <div class="cell">
       <label>에폭시</label>
@@ -662,6 +686,8 @@ function renderSummary(){
 
   applyEpoxyAuto(epoxyCount);
 
+  const dimRows = dims.map(d=>`<tr><td>${d.toLocaleString()}</td><td>${counts[d]}</td><td>${(d*counts[d]).toLocaleString()}</td></tr>`).join('');
+
   const box = document.getElementById('summaryBox');
   box.innerHTML = `
     <h3>치수별 개수 미리보기</h3>
@@ -672,7 +698,16 @@ function renderSummary(){
       <div class="item">치수 종류<b>${dims.length}</b></div>
       <div class="item">에폭시 자동계산(15m당 1개)<b>${totalM>0 ? '⌈'+totalM.toFixed(3)+' ÷ 15⌉ = '+epoxyCount+'개' : '-'}</b></div>
     </div>
-    ${dims.length ? `<div class="hint" style="margin-top:14px;">엑셀 다운로드 시 이 데이터가 '치수별 개수' 시트에 수식과 함께 정리됩니다.</div>` : `<div class="hint" style="margin-top:14px;">아직 표에 값이 없습니다.</div>`}
+    ${dims.length ? `
+    <table class="dimtable">
+      <thead><tr><th>치수(mm)</th><th>개수</th><th>소계(mm)</th></tr></thead>
+      <tbody>
+        ${dimRows}
+        <tr class="dimtotal"><td>합계</td><td>${totalCount}</td><td>${totalMM.toLocaleString()}</td></tr>
+      </tbody>
+    </table>
+    <div class="hint" style="margin-top:10px;">치수가 큰 순으로 정렬됩니다. 엑셀 다운로드 시 이 표가 '치수별 개수' 시트에 수식과 함께 정리됩니다.</div>
+    ` : `<div class="hint" style="margin-top:14px;">아직 표에 값이 없습니다.</div>`}
   `;
 }
 

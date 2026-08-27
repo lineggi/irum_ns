@@ -51,6 +51,25 @@ function chooseModel(available, tier) {
   return available[0] || null;
 }
 
+// 과부하 등으로 실패할 때 순서대로 시도할 모델 체인(최대 4개)
+function buildCandidateChain(available, tier) {
+  const kw = tier === 'pro' ? 'pro' : 'flash';
+  const chain = [];
+  const chosen = chooseModel(available, tier);
+  if (chosen) chain.push(chosen);
+  const pool = available
+    .filter((n) => n.toLowerCase().includes(kw) && !EXCLUDE.test(n))
+    .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+  for (const m of pool) if (!chain.includes(m)) chain.push(m);
+  return chain.slice(0, 4);
+}
+
+// 일시적/재시도 가능한 오류인지 (과부하·한도·5xx)
+function isRetryable(status, msg) {
+  if ([429, 500, 502, 503, 504].includes(status)) return true;
+  return /high demand|overload|try again later|unavailable|temporarily|resource has been exhausted/i.test(msg || '');
+}
+
 // 진단용: GET /api/recognize?debug=1 → 사용 가능한 모델 목록
 export async function GET({ request }) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -92,30 +111,40 @@ export async function POST({ request }) {
     return json({ error: '이 API 키로 사용 가능한 인식 모델이 없습니다. 키/프로젝트 설정을 확인해주세요.' }, 502);
   }
 
-  // 2) tier에 맞는 모델 선택
-  const model = chooseModel(listed.models, tier);
-  if (!model) return json({ error: '사용할 모델을 찾지 못했습니다.', available: listed.models.slice(0, 30) }, 502);
+  // 2) tier에 맞는 모델 체인 구성 (과부하 시 다음 모델로 폴백)
+  const chain = buildCandidateChain(listed.models, tier);
+  if (!chain.length) return json({ error: '사용할 모델을 찾지 못했습니다.', available: listed.models.slice(0, 30) }, 502);
 
-  // 3) 인식 호출
-  try {
-    const url = `${API_BASE}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents, generationConfig }),
-    });
-    const text = await r.text();
-    if (!r.ok) {
+  // 3) 체인을 순서대로 시도
+  const reqBody = JSON.stringify({ contents, generationConfig });
+  let lastMsg = '인식 실패';
+  let lastStatus = 502;
+  for (const model of chain) {
+    try {
+      const url = `${API_BASE}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: reqBody,
+      });
+      const text = await r.text();
+      if (r.ok) {
+        return new Response(text, {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', 'X-Used-Model': model },
+        });
+      }
       let msg = 'HTTP ' + r.status;
       try { const e = JSON.parse(text); if (e.error && e.error.message) msg = e.error.message; } catch (_) {}
-      // 404 등 모델 오류를 502로 감싸 전달(도구가 "서버 없음"으로 오인하지 않게) + 실제 메시지 포함
-      return json({ error: `모델 '${model}' 호출 실패: ${msg}`, usedModel: model }, 502);
+      lastMsg = `모델 '${model}': ${msg}`;
+      lastStatus = r.status;
+      if (!isRetryable(r.status, msg)) break; // 재시도 불가 오류면 즉시 중단
+      // 과부하 등 → 다음 후보 모델로 계속
+    } catch (e) {
+      lastMsg = '프록시 처리 오류: ' + String((e && e.message) || e);
+      lastStatus = 500;
     }
-    return new Response(text, {
-      status: 200,
-      headers: { 'Content-Type': 'application/json; charset=utf-8', 'X-Used-Model': model },
-    });
-  } catch (e) {
-    return json({ error: '프록시 처리 오류: ' + String((e && e.message) || e) }, 500);
   }
+  const suffix = chain.length > 1 ? ` (${chain.length}개 모델 시도했으나 모두 실패 — 대부분 일시적 과부하이니 잠시 후 다시 시도해주세요)` : '';
+  return json({ error: lastMsg + suffix, triedModels: chain }, lastStatus === 404 ? 502 : lastStatus);
 }

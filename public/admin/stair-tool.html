@@ -111,6 +111,12 @@
     padding:2px 0; border-bottom:1px solid transparent;
   }
   .titleblock input:focus{border-bottom:1px solid var(--blue);}
+  .titleblock select{
+    width:100%; border:none; outline:none; background:transparent; cursor:pointer;
+    font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--ink);
+    padding:2px 0; border-bottom:1px solid transparent;
+  }
+  .titleblock select:focus{border-bottom:1px solid var(--blue);}
   .titleblock .wide{grid-column:span 2;}
   .epoxycheck{margin-top:6px;}
   .epoxycheck .chk{
@@ -207,6 +213,13 @@
   }
   .summarygrid{display:flex; gap:28px; flex-wrap:wrap; font-family:'IBM Plex Mono', monospace; font-size:13px;}
   .summarygrid .item b{display:block; font-size:20px; color:var(--blue-dark); margin-top:2px;}
+  .dimtable{width:100%; max-width:520px; border-collapse:collapse; margin-top:18px; font-family:'IBM Plex Mono', monospace; font-size:13px;}
+  .dimtable th{background:var(--ink); color:#fff; padding:7px 12px; text-align:right; font-weight:600; font-size:12px;}
+  .dimtable th:first-child{text-align:left;}
+  .dimtable td{border:1px solid var(--line); padding:6px 12px; text-align:right;}
+  .dimtable td:first-child{text-align:left; font-weight:600;}
+  .dimtable tr:nth-child(even) td{background:#FBFAF7;}
+  .dimtable .dimtotal td{background:#EAF1F6; font-weight:700; color:var(--blue-dark); border-top:2px solid var(--ink);}
   .match-ok{color:var(--green); font-weight:700;}
   .match-bad{color:var(--red); font-weight:700;}
 
@@ -215,6 +228,17 @@
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
   }
   footer{text-align:center; color:var(--ink-soft); font-size:12px; margin-top:40px; font-family:'IBM Plex Mono', monospace;}
+
+  /* 원본 대조 크롭 열 */
+  table.datatable td.cropcell{padding:4px 6px; background:#fff; min-width:120px;}
+  .cropimg{display:block; max-width:220px; height:auto; max-height:56px; object-fit:contain; border:1px solid var(--line); border-radius:4px; cursor:zoom-in; background:#fff;}
+  .cropimg:hover{border-color:var(--blue);}
+  .cropnone{color:var(--ink-soft);}
+  /* 크게보기 모달 */
+  .cropmodal{position:fixed; inset:0; background:rgba(28,43,57,.82); display:none; align-items:center; justify-content:center; z-index:1000; padding:24px; cursor:zoom-out;}
+  .cropmodal.on{display:flex;}
+  .cropmodal img{max-width:96vw; max-height:90vh; border:3px solid #fff; border-radius:6px; box-shadow:0 10px 40px rgba(0,0,0,.4);}
+  .cropmodal .closehint{position:fixed; top:18px; right:22px; color:#fff; font-family:'IBM Plex Mono',monospace; font-size:13px;}
 </style>
 </head>
 <body>
@@ -246,7 +270,18 @@
 
   <div class="titleblock" id="titleblock">
     <div class="cell wide"><label>장소</label><input type="text" id="meta_장소" placeholder="예: 안양 연성대학교 창조관"></div>
-    <div class="cell"><label>품목</label><input type="text" id="meta_품목" placeholder="예: 세라믹 62"></div>
+    <div class="cell"><label>품목</label>
+      <select id="meta_품목">
+        <option value="">— 선택 —</option>
+        <option>세라믹 논슬립 테이프</option>
+        <option>세라믹 각 논슬립 62</option>
+        <option>세라믹 각 논슬립 75</option>
+        <option>알루미늄 논슬립 AL 60-S</option>
+        <option>알루미늄 논슬립 AL 601-1</option>
+        <option>알루미늄 논슬립 AL 507</option>
+        <option>기타</option>
+      </select>
+    </div>
     <div class="cell"><label>색상</label><input type="text" id="meta_색상" placeholder="예: 회색"></div>
     <div class="cell">
       <label>에폭시</label>
@@ -270,6 +305,8 @@
 
   <footer>사진은 손글씨 인식을 요청할 때만 이룸NS 서버를 거쳐 Google Gemini로 전송됩니다. 표 데이터는 이 브라우저 밖으로 저장되지 않습니다.</footer>
 </div>
+
+<div class="cropmodal" id="cropModal"><span class="closehint">클릭하면 닫힘 ✕</span><img id="cropModalImg" src="" alt="원본 확대"></div>
 
 <script>
 /* ===================== 설정 ===================== */
@@ -496,8 +533,8 @@ async function recognizeHandwriting(){
 
 {
   "rows": [
-    {"구분": "상", "번호": 1, "values": {"${sc.floors[0]||'층1'}": 1755, "${sc.floors[1]||'층2'}": 1870}},
-    {"구분": "상", "번호": 2, "values": {"${sc.floors[0]||'층1'}": 1810, "${sc.floors[1]||'층2'}": 1870}}
+    {"구분": "상", "번호": 1, "img": 0, "box": [120, 40, 175, 960], "values": {"${sc.floors[0]||'층1'}": 1755, "${sc.floors[1]||'층2'}": 1870}},
+    {"구분": "상", "번호": 2, "img": 0, "box": [176, 40, 231, 960], "values": {"${sc.floors[0]||'층1'}": 1810, "${sc.floors[1]||'층2'}": 1870}}
   ]
 }
 
@@ -506,7 +543,9 @@ async function recognizeHandwriting(){
 - 숫자만 추출하고 단위(mm)는 붙이지 마세요.
 - 칸이 비어있거나 손글씨를 판독할 수 없으면 그 층 값은 null로 표기하세요.
 - '구분'은 사진에 적힌 그대로(상/중/하 등) 옮기세요.
-- 번호는 사진에 적힌 순번을 정수로 옮기세요.`;
+- 번호는 사진에 적힌 순번을 정수로 옮기세요.
+- "img": 그 행이 나온 사진의 인덱스(0부터). 사진이 한 장이면 항상 0.
+- "box": 그 행(가로 한 줄 전체)이 사진에서 차지하는 영역의 바운딩 박스. 반드시 [ymin, xmin, ymax, xmax] 순서이고 각 값은 0~1000으로 정규화(사진 왼쪽위 0, 오른쪽아래 1000). 이 박스는 사용자가 원본과 대조할 때 사용하므로, 번호·구분·치수 칸이 모두 포함되도록 그 줄 전체를 넉넉히 잡으세요.`;
 
   // Gemini API 요청 본문: 텍스트 프롬프트 + 이미지들(inline base64)
   const parts = [{text: promptText}];
@@ -547,14 +586,20 @@ async function recognizeHandwriting(){
     const parsed = JSON.parse(cleaned);
     if(!parsed.rows || !Array.isArray(parsed.rows)) throw new Error('rows 형식이 올바르지 않습니다.');
 
-    sc.rows = parsed.rows.map(r=>({
-      구분: r.구분 ?? '',
-      번호: r.번호 ?? '',
-      values: sc.floors.reduce((acc,f)=>{ acc[f] = (r.values && r.values[f]!=null) ? r.values[f] : ''; return acc; }, {})
-    }));
+    sc.rows = parsed.rows.map(r=>{
+      const box = (Array.isArray(r.box) && r.box.length===4 && r.box.every(n=>typeof n==='number')) ? r.box : null;
+      const img = (typeof r.img==='number' && r.img>=0 && r.img<sc.images.length) ? r.img : 0;
+      return {
+        구분: r.구분 ?? '',
+        번호: r.번호 ?? '',
+        box, img, crop: '',
+        values: sc.floors.reduce((acc,f)=>{ acc[f] = (r.values && r.values[f]!=null) ? r.values[f] : ''; return acc; }, {})
+      };
+    });
 
     statusEl.className='status ok';
-    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. 아래 표에서 오독된 값이 없는지 사진과 대조해 확인해주세요.`;
+    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. 오른쪽 '원본' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`;
+    await buildCrops(sc);   // 원본 대조용 이미지 크롭 생성
     renderTable();
     renderSummary();
   }catch(err){
@@ -571,6 +616,40 @@ async function recognizeHandwriting(){
   }
 }
 
+/* ===================== 원본 대조용 이미지 크롭 생성 ===================== */
+function loadImg(src){
+  return new Promise((res)=>{ const el=new Image(); el.onload=()=>res(el); el.onerror=()=>res(null); el.src=src; });
+}
+async function buildCrops(sc){
+  try{
+    const imgEls = await Promise.all(sc.images.map(im=>loadImg(`data:${im.mediaType};base64,${im.base64}`)));
+    sc.rows.forEach(r=>{
+      r.crop = '';
+      if(!r.box){ return; }
+      const el = imgEls[r.img] || imgEls[0];
+      if(!el || !el.naturalWidth){ return; }
+      const W = el.naturalWidth, H = el.naturalHeight;
+      let [ymin,xmin,ymax,xmax] = r.box;
+      // 0~1000 정규화 → 픽셀
+      let sx = xmin/1000*W, sy = ymin/1000*H;
+      let sw = (xmax-xmin)/1000*W, sh = (ymax-ymin)/1000*H;
+      if(sw<=1 || sh<=1){ return; }
+      // 여유 패딩 (세로 넉넉히)
+      const padX = sw*0.03, padY = sh*0.25;
+      sx = Math.max(0, sx-padX); sy = Math.max(0, sy-padY);
+      sw = Math.min(W-sx, sw+padX*2); sh = Math.min(H-sy, sh+padY*2);
+      const scale = Math.min(1, 640/sw);
+      try{
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(sw*scale));
+        c.height = Math.max(1, Math.round(sh*scale));
+        c.getContext('2d').drawImage(el, sx, sy, sw, sh, 0, 0, c.width, c.height);
+        r.crop = c.toDataURL('image/jpeg', 0.85);
+      }catch(e){ r.crop=''; }
+    });
+  }catch(e){ /* 크롭 실패해도 표는 정상 동작 */ }
+}
+
 /* ===================== 렌더: 데이터 표 ===================== */
 function renderTable(){
   const sc = getActive();
@@ -585,9 +664,16 @@ function renderTable(){
     return;
   }
 
-  let thead = '<tr><th>구분</th><th>번호</th>' + sc.floors.map(f=>`<th>${f}</th>`).join('') + '<th></th></tr>';
+  const hasCrops = sc.rows.some(r=>r.crop);
+  let thead = '<tr>' + (hasCrops ? '<th>원본(대조)</th>' : '') + '<th>구분</th><th>번호</th>' + sc.floors.map(f=>`<th>${f}</th>`).join('') + '<th></th></tr>';
   let tbody = sc.rows.map((r,ri)=>{
-    let cells = `<td><input value="${r.구분}" data-ri="${ri}" data-field="구분"></td>`;
+    let cells = '';
+    if(hasCrops){
+      cells += r.crop
+        ? `<td class="cropcell"><img src="${r.crop}" class="cropimg" alt="원본 조각" data-full="${r.crop}" title="클릭하면 크게 보기"></td>`
+        : `<td class="cropcell"><span class="cropnone">—</span></td>`;
+    }
+    cells += `<td><input value="${r.구분}" data-ri="${ri}" data-field="구분"></td>`;
     cells += `<td><input value="${r.번호}" data-ri="${ri}" data-field="번호"></td>`;
     sc.floors.forEach(f=>{
       cells += `<td><input value="${r.values[f] ?? ''}" data-ri="${ri}" data-floor="${f}"></td>`;
@@ -600,9 +686,13 @@ function renderTable(){
     <table class="datatable"><thead>${thead}</thead><tbody>${tbody}</tbody></table>
     <div class="tablefoot">
       <button class="ghost" id="addRow">+ 행 추가</button>
-      <span class="hint">셀을 클릭해 직접 수정할 수 있습니다.</span>
+      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'}</span>
     </div>
   `;
+
+  area.querySelectorAll('.cropimg').forEach(img=>{
+    img.addEventListener('click', ()=> openCropModal(img.dataset.full));
+  });
 
   area.querySelectorAll('input[data-field]').forEach(inp=>{
     inp.addEventListener('input', (e)=>{
@@ -662,6 +752,8 @@ function renderSummary(){
 
   applyEpoxyAuto(epoxyCount);
 
+  const dimRows = dims.map(d=>`<tr><td>${d.toLocaleString()}</td><td>${counts[d]}</td><td>${(d*counts[d]).toLocaleString()}</td></tr>`).join('');
+
   const box = document.getElementById('summaryBox');
   box.innerHTML = `
     <h3>치수별 개수 미리보기</h3>
@@ -672,7 +764,16 @@ function renderSummary(){
       <div class="item">치수 종류<b>${dims.length}</b></div>
       <div class="item">에폭시 자동계산(15m당 1개)<b>${totalM>0 ? '⌈'+totalM.toFixed(3)+' ÷ 15⌉ = '+epoxyCount+'개' : '-'}</b></div>
     </div>
-    ${dims.length ? `<div class="hint" style="margin-top:14px;">엑셀 다운로드 시 이 데이터가 '치수별 개수' 시트에 수식과 함께 정리됩니다.</div>` : `<div class="hint" style="margin-top:14px;">아직 표에 값이 없습니다.</div>`}
+    ${dims.length ? `
+    <table class="dimtable">
+      <thead><tr><th>치수(mm)</th><th>개수</th><th>소계(mm)</th></tr></thead>
+      <tbody>
+        ${dimRows}
+        <tr class="dimtotal"><td>합계</td><td>${totalCount}</td><td>${totalMM.toLocaleString()}</td></tr>
+      </tbody>
+    </table>
+    <div class="hint" style="margin-top:10px;">치수가 큰 순으로 정렬됩니다. 엑셀 다운로드 시 이 표가 '치수별 개수' 시트에 수식과 함께 정리됩니다.</div>
+    ` : `<div class="hint" style="margin-top:14px;">아직 표에 값이 없습니다.</div>`}
   `;
 }
 
@@ -770,6 +871,20 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
     statusEl.textContent = '생성 실패: ' + err.message;
   }
 });
+
+/* ===================== 원본 크롭 크게보기 모달 ===================== */
+function openCropModal(src){
+  const m = document.getElementById('cropModal');
+  const im = document.getElementById('cropModalImg');
+  if(!m || !im || !src) return;
+  im.src = src;
+  m.classList.add('on');
+}
+(function(){
+  const m = document.getElementById('cropModal');
+  if(m) m.addEventListener('click', ()=> m.classList.remove('on'));
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && m) m.classList.remove('on'); });
+})();
 
 /* ===================== 초기 실행 ===================== */
 document.getElementById('epoxyAuto').addEventListener('change', renderSummary);

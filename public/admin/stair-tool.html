@@ -74,16 +74,8 @@
     font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.06em;
     text-transform:uppercase; color:var(--ink-soft);
   }
-  .keybar input{
-    flex:1; min-width:240px; padding:9px 11px; border:1.5px solid var(--line); border-radius:5px;
-    font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--ink); outline:none;
-  }
-  .keybar input:focus{border-color:var(--blue);}
   .keybar .keyhint{font-size:12px; color:var(--ink-soft); margin-top:9px; line-height:1.55;}
   .keybar .keyhint a{color:var(--blue);}
-  .keystate{font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
-  .keystate.ok{color:var(--green);}
-  .keystate.none{color:var(--rust);}
 
   /* ===== Title block (metadata stamp) ===== */
   .titleblock{
@@ -179,11 +171,6 @@
     border-radius:5px; cursor:pointer;
   }
   button.ghost:hover{background:#EAF1F6;}
-  button.danger-ghost{
-    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:12px;
-    background:none; color:var(--red); border:1.5px solid var(--red); padding:5px 10px;
-    border-radius:5px; cursor:pointer;
-  }
 
   .status{font-family:'IBM Plex Mono', monospace; font-size:13px; margin-top:12px;}
   .status.loading{color:var(--blue);}
@@ -220,8 +207,6 @@
   .dimtable td:first-child{text-align:left; font-weight:600;}
   .dimtable tr:nth-child(even) td{background:#FBFAF7;}
   .dimtable .dimtotal td{background:#EAF1F6; font-weight:700; color:var(--blue-dark); border-top:2px solid var(--ink);}
-  .match-ok{color:var(--green); font-weight:700;}
-  .match-bad{color:var(--red); font-weight:700;}
 
   .exportbar{
     margin-top:30px; padding-top:24px; border-top:2px solid var(--ink);
@@ -369,7 +354,7 @@ function renderTabs(){
   staircases.forEach(sc=>{
     const tab = document.createElement('div');
     tab.className = 'tab' + (sc.id===activeId ? ' active':'');
-    tab.innerHTML = `<span class="tabname">${sc.name}</span>` + (staircases.length>1 ? `<span class="del" data-id="${sc.id}">×</span>` : '');
+    tab.innerHTML = `<span class="tabname">${escAttr(sc.name)}</span>` + (staircases.length>1 ? `<span class="del" data-id="${sc.id}">×</span>` : '');
     tab.addEventListener('click', (e)=>{
       if(e.target.classList.contains('del')){
         e.stopPropagation();
@@ -403,11 +388,11 @@ function renderPanel(){
     <div class="row">
       <div class="field" style="max-width:260px;">
         <label>계단 이름</label>
-        <input type="text" id="scName" value="${sc.name}">
+        <input type="text" id="scName" value="${escAttr(sc.name)}">
       </div>
       <div class="field">
         <label>층 컬럼 (왼쪽→오른쪽 순서, 쉼표로 구분)</label>
-        <input type="text" id="scFloors" value="${sc.floors.join(',')}">
+        <input type="text" id="scFloors" value="${escAttr(sc.floors.join(','))}">
         <div class="hint">사진 속 표의 컬럼 순서와 동일하게 입력하세요. 계단마다 옥탑/지하1층 유무가 다를 수 있습니다.</div>
       </div>
     </div>
@@ -508,6 +493,7 @@ async function handleImageUpload(e){
 /* ===================== 손글씨 표기 → 실제 mm 변환 =====================
    현장 표기 규칙: 1000 미만으로 적힌 값은 뒤 0이 생략된 것(×10).
    예) 152 → 1520,  138.3 → 1383,  이미 네 자리(1755)면 그대로. */
+function escAttr(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function normalizeMm(v){
   if(v==null || v==='') return '';
   const n = parseFloat(String(v).replace(/[^0-9.\-]/g,''));
@@ -608,7 +594,7 @@ async function recognizeHandwriting(){
     });
 
     statusEl.className='status ok';
-    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. 오른쪽 '원본' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`;
+    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. '원본(대조)' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`;
     await buildCrops(sc);   // 원본 대조용 이미지 크롭 생성
     renderTable();
     renderSummary();
@@ -675,7 +661,7 @@ function renderTable(){
   }
 
   const hasCrops = sc.rows.some(r=>r.crop);
-  let thead = '<tr>' + (hasCrops ? '<th>원본(대조)</th>' : '') + '<th>구분</th><th>번호</th>' + sc.floors.map(f=>`<th>${f}</th>`).join('') + '<th></th></tr>';
+  let thead = '<tr>' + (hasCrops ? '<th>원본(대조)</th>' : '') + '<th>구분</th><th>번호</th>' + sc.floors.map(f=>`<th>${escAttr(f)}</th>`).join('') + '<th></th></tr>';
   let tbody = sc.rows.map((r,ri)=>{
     let cells = '';
     if(hasCrops){
@@ -683,10 +669,10 @@ function renderTable(){
         ? `<td class="cropcell"><img src="${r.crop}" class="cropimg" alt="원본 조각" data-full="${r.crop}" title="클릭하면 크게 보기"></td>`
         : `<td class="cropcell"><span class="cropnone">—</span></td>`;
     }
-    cells += `<td><input value="${r.구분}" data-ri="${ri}" data-field="구분"></td>`;
-    cells += `<td><input value="${r.번호}" data-ri="${ri}" data-field="번호"></td>`;
+    cells += `<td><input value="${escAttr(r.구분)}" data-ri="${ri}" data-field="구분"></td>`;
+    cells += `<td><input value="${escAttr(r.번호)}" data-ri="${ri}" data-field="번호"></td>`;
     sc.floors.forEach(f=>{
-      cells += `<td><input value="${r.values[f] ?? ''}" data-ri="${ri}" data-floor="${f}"></td>`;
+      cells += `<td><input value="${escAttr(r.values[f] ?? '')}" data-ri="${ri}" data-floor="${escAttr(f)}"></td>`;
     });
     cells += `<td class="rowdel" data-ri="${ri}">×</td>`;
     return `<tr>${cells}</tr>`;
@@ -851,28 +837,31 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
       sumAoA[targetRow][5] = v;
     });
 
-    const dataEndRow = dims.length+1; // last data row number (1-indexed, header=1)
-    const blankRow = dataEndRow+1;
-    const r1 = blankRow+1, r2 = blankRow+2, r3 = blankRow+3, r4 = blankRow+4, r5 = blankRow+5;
+    const dataEndRow = dims.length+1; // 마지막 데이터 행(1-indexed, header=1)
+    const totalCountVal = dims.reduce((s,d)=>s+counts[d],0);
+    const totalMMval = dims.reduce((s,d)=>s+d*counts[d],0);
 
-    while(sumAoA.length < blankRow) sumAoA.push(['','','','','','']);
+    // 데이터/메타 아래 한 줄 띄우고 합계 블록 배치.
+    // Array.push()의 반환값(새 길이) = 방금 넣은 행의 시트 행번호 → 수식이 항상 올바른 셀을 참조.
+    const contentEnd = Math.max(dataEndRow, metaRows.length + 1);
+    while(sumAoA.length < contentEnd) sumAoA.push(['','','','','','']);
     sumAoA.push(['']); // 빈 줄
-    sumAoA.push(['전체 개수', {t:'n', f:`SUM(B2:B${dataEndRow})`, v: dims.reduce((s,d)=>s+counts[d],0)}]);
-    sumAoA.push(['전체 합계(mm)', {t:'n', f:`SUM(C2:C${dataEndRow})`, v: dims.reduce((s,d)=>s+d*counts[d],0)}]);
-    sumAoA.push(['전체 합계(m)', {t:'n', f:`B${r2}/1000`, v: dims.reduce((s,d)=>s+d*counts[d],0)/1000}]);
-    sumAoA.push(['개요 기록값(m)', '']); // 사용자가 직접 채우는 칸
-    sumAoA.push(['일치 여부', {t:'str', f:`IF(ROUND(B${r3},2)=ROUND(B${r4},2),"일치 ✓","불일치")`, v:'개요 기록값 입력 후 확인'}]);
+
+    sumAoA.push(['전체 개수', {t:'n', f:`SUM(B2:B${dataEndRow})`, v: totalCountVal}]);
+    const rTotalMM = sumAoA.push(['전체 합계(mm)', {t:'n', f:`SUM(C2:C${dataEndRow})`, v: totalMMval}]);
+    const rTotalM  = sumAoA.push(['전체 합계(m)', {t:'n', f:`B${rTotalMM}/1000`, v: totalMMval/1000}]);
+    const rOutline = sumAoA.push(['개요 기록값(m)', '']); // 사용자가 직접 채우는 칸
+    sumAoA.push(['일치 여부', {t:'str', f:`IF(ROUND(B${rTotalM},2)=ROUND(B${rOutline},2),"일치 ✓","불일치")`, v:'개요 기록값 입력 후 확인'}]);
     if(epoxyAuto){
-      const totalMval = dims.reduce((s,d)=>s+d*counts[d],0)/1000;
-      sumAoA.push(['에폭시 개수(15m당 1개, 올림)', {t:'n', f:`CEILING(B${r3}/15,1)`, v: Math.ceil(totalMval/15)}]);
+      sumAoA.push(['에폭시 개수(15m당 1개, 올림)', {t:'n', f:`CEILING(B${rTotalM}/15,1)`, v: Math.ceil(totalMMval/1000/15)}]);
     }
 
     const wsSum = XLSX.utils.aoa_to_sheet(sumAoA);
     wsSum['!cols'] = [{wch:14},{wch:10},{wch:14},{wch:3},{wch:12},{wch:26}];
     XLSX.utils.book_append_sheet(wb, wsSum, '치수별 개수');
 
-    const filenameBase = (meta.장소 || '계단실측') + '_' + new Date().toISOString().slice(0,10);
-    XLSX.writeFile(wb, filenameBase + '.xlsx');
+    const safeName = (meta.장소 || '계단실측').replace(/[\\/:*?"<>|]/g,'_').trim() || '계단실측';
+    XLSX.writeFile(wb, safeName + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
 
     statusEl.className='status ok';
     statusEl.textContent = '엑셀 파일이 다운로드되었습니다. "개요 기록값(m)" 칸은 시공 개요서 수치를 직접 입력해 대조해보세요.';

@@ -38,6 +38,18 @@ async function listModels(apiKey) {
   return { ok: true, models };
 }
 
+// 웜 인스턴스에서 모델 목록을 10분간 캐시해 지연·쿼터를 줄인다(인스턴스별 best-effort).
+const MODEL_TTL = 10 * 60 * 1000;
+let _modelCache = { at: 0, models: null };
+async function getModels(apiKey) {
+  if (_modelCache.models && (Date.now() - _modelCache.at) < MODEL_TTL) {
+    return { ok: true, models: _modelCache.models };
+  }
+  const listed = await listModels(apiKey);
+  if (listed.ok) _modelCache = { at: Date.now(), models: listed.models };
+  return listed;
+}
+
 function chooseModel(available, tier) {
   const candidates = tier === 'pro' ? PRO_CANDIDATES : FLASH_CANDIDATES;
   for (const c of candidates) {
@@ -100,8 +112,8 @@ export async function POST({ request }) {
   const generationConfig = body.generationConfig || { temperature: 0, responseMimeType: 'application/json' };
   if (!contents) return json({ error: '요청 본문에 contents가 없습니다.' }, 400);
 
-  // 1) 사용 가능한 모델 조회
-  const listed = await listModels(apiKey);
+  // 1) 사용 가능한 모델 조회 (캐시 사용)
+  const listed = await getModels(apiKey);
   if (!listed.ok) {
     let msg = 'HTTP ' + listed.status;
     try { const e = JSON.parse(listed.text); if (e.error && e.error.message) msg = e.error.message; } catch (_) {}

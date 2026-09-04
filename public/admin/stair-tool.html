@@ -197,6 +197,24 @@
   table.datatable td.badcell{background:#FAE9E7 !important; box-shadow:inset 0 0 0 1.5px var(--red);}
   table.datatable td.badcell input{color:var(--red); font-weight:700;}
   .editbadge{font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:var(--rust);}
+  /* cm 표기인지 실제 mm인지 자동으로 확정할 수 없는 셀 */
+  table.datatable td.ambig{background:#FFF8D6 !important; box-shadow:inset 0 0 0 1.5px #C9A227;}
+  table.datatable td.ambig input{color:#8A6D0B; font-weight:700;}
+  .ambigbadge{font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:#8A6D0B;}
+  /* 셀 안의 cm↔mm 전환 버튼 (평소엔 숨기고, 확인 필요 셀·마우스 올린 셀에만 보인다) */
+  table.datatable td.numcell{position:relative;}
+  .unittoggle{
+    position:absolute; right:2px; top:50%; transform:translateY(-50%);
+    border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace; font-size:10px; line-height:1;
+    padding:3px 4px; border-radius:3px; cursor:pointer; opacity:0; transition:opacity .12s;
+  }
+  table.datatable td.numcell:hover .unittoggle{opacity:1;}
+  table.datatable td.ambig .unittoggle{opacity:1; border-color:#C9A227; color:#8A6D0B;}
+  .unittoggle:hover{border-color:var(--blue); color:var(--blue);}
+  /* 계단별 단위 표기 선택 */
+  .unitmode{padding:9px 10px; border:1.5px solid var(--line); border-radius:5px; background:#fff;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink);}
   .tablefoot{display:flex; justify-content:space-between; align-items:center; margin-top:12px;}
 
   .summarybox{
@@ -327,8 +345,9 @@ function newStaircase(name, floors){
     id:'sc'+idCounter,
     name: name || ('계단 ' + idCounter),
     floors: floors || ['5층','4층','3층','2층','1층'],
+    unit: 'auto', // 손글씨 표기 방식: auto | cm(축약 표기, 전부 ×10) | mm(적힌 그대로)
     images: [], // {name, mediaType, base64}
-    rows: []    // {구분, 번호, values:{floor:value}}
+    rows: []    // {구분, 번호, values:{floor:value}, amb:{floor:true}}
   };
 }
 
@@ -402,6 +421,15 @@ function renderPanel(){
         <input type="text" id="scFloors" value="${escAttr(sc.floors.join(','))}">
         <div class="hint">사진 속 표의 컬럼 순서와 동일하게 입력하세요. 계단마다 옥탑/지하1층 유무가 다를 수 있습니다.</div>
       </div>
+      <div class="field" style="max-width:230px;">
+        <label>기록지 표기</label>
+        <select id="scUnit" class="unitmode">
+          <option value="auto">자동 판정 (기본)</option>
+          <option value="cm">cm 축약 표기 (152 = 1520mm)</option>
+          <option value="mm">실제 mm 그대로 (920 = 920mm)</option>
+        </select>
+        <div class="hint">이 계단 기록지의 표기가 통일돼 있으면 지정하세요. 자동 판정은 500 이상이면 실제 mm, 300~499는 확인을 요청합니다.</div>
+      </div>
     </div>
 
     <div class="row">
@@ -422,6 +450,27 @@ function renderPanel(){
   `;
 
   document.getElementById('scName').addEventListener('input', (e)=>{ sc.name=e.target.value; renderTabs(); });
+  const unitSel = document.getElementById('scUnit');
+  unitSel.value = sc.unit || 'auto';
+  unitSel.addEventListener('change', (e)=>{
+    sc.unit = e.target.value;
+    // 표기를 확정했으면 이미 들어온 값들을 그 기준으로 다시 계산한다.
+    // (사용자가 직접 고친 칸은 건드리지 않는다)
+    sc.rows.forEach(r=>{
+      if(!r.raw) return;            // 손으로 추가한 행은 원문이 없으므로 건드리지 않는다
+      r.amb = r.amb || {};
+      sc.floors.forEach(f=>{
+        if(isEdited(r, null, f)) return;   // 사용자가 직접 고친 칸은 그대로 둔다
+        const raw = r.raw[f];
+        if(raw === undefined || raw === '') return;
+        const res = toMm(raw, sc.unit);
+        r.values[f] = res.v;
+        if(r.orig && r.orig.values) r.orig.values[f] = res.v;  // 기준값도 함께 옮겨준다
+        if(res.amb) r.amb[f] = true; else delete r.amb[f];
+      });
+    });
+    renderTable(); renderSummary();
+  });
   document.getElementById('scFloors').addEventListener('change', (e)=>{
     const floors = e.target.value.split(',').map(s=>s.trim()).filter(Boolean);
     sc.floors = floors;
@@ -498,16 +547,48 @@ async function handleImageUpload(e){
 }
 
 /* ===================== 손글씨 표기 → 실제 mm 변환 =====================
-   현장 표기 규칙: 1000 미만으로 적힌 값은 뒤 0이 생략된 것(×10).
-   예) 152 → 1520,  138.3 → 1383,  이미 네 자리(1755)면 그대로. */
+   현장에서는 계단 치수를 cm로 줄여 적는 일이 많다(152 = 1520mm, 138.3 = 1383mm).
+   그런데 500~999mm처럼 세 자리 실제 치수도 존재하므로 "1000 미만이면 무조건 ×10"은 쓸 수 없다.
+   실제 계단 치수 분포를 기준으로 아래처럼 나눈다.
+
+     적힌 값        판정            근거
+     ─────────────────────────────────────────────────────────────
+     소수점 포함    cm 표기 ×10     138.3mm 같은 실제 치수는 없다
+     1000 이상      실제 mm 그대로  네 자리는 이미 mm
+     500 ~ 999      실제 mm 그대로  cm로 보면 5000mm 이상 = 계단 폭 5m, 비현실적
+     300 ~ 499      cm 표기 ×10 (확인 필요)  3000~4990mm일 수도, 실제 300~499mm일 수도
+     299 이하       cm 표기 ×10     실제 300mm 미만 단은 없다
+
+   300~499 구간만 양쪽 다 가능하므로 자동 변환은 하되 노란색으로 표시해 눈으로 확인하게 한다.
+   계단마다 표기가 통일돼 있으면 계단별 '표기' 선택(cm/mm)으로 자동 판정을 끌 수 있고,
+   개별 칸은 셀의 ⇅ 버튼으로 ×10 / ÷10 을 즉시 뒤집을 수 있다. */
+const MM_MIN   = 500; // 이 값 이상으로 적혔으면 실제 mm로 본다
+const AMBIG_LO = 300; // 300~499 는 판정이 갈리는 구간
 function escAttr(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function normalizeMm(v){
-  if(v==null || v==='') return '';
-  // 천단위 쉼표를 먼저 없앤다. 그냥 두면 '1,520' → '1.520' → 1.52 로 읽혀 15가 되어버린다.
+
+// 숫자만 뽑아낸다. 천단위 쉼표를 남겨두면 '1,520' → '1.520' → 1.52 로 읽혀 15가 되어버린다.
+function parseNum(v){
+  if(v==null || v==='') return null;
   const n = parseFloat(String(v).replace(/,/g,'').replace(/[^0-9.\-]/g,''));
-  if(isNaN(n)) return (typeof v==='string' ? v : '');
-  return n < 1000 ? Math.round(n*10) : Math.round(n);
+  return isNaN(n) ? null : n;
 }
+
+// 손글씨에 적힌 값 → 실제 mm. mode: 'auto' | 'cm' | 'mm'
+// 반환 {v, amb} — amb=true면 cm/mm 판정이 갈리는 값이라 사용자 확인이 필요하다.
+function toMm(v, mode){
+  const n = parseNum(v);
+  if(n === null) return { v: (typeof v === 'string' ? v : ''), amb: false };
+  if(mode === 'mm') return { v: Math.round(n), amb: false };
+  // cm 표기로 지정된 계단이라도 이미 네 자리로 적힌 값은 그대로 둔다(중복 ×10 방지).
+  if(mode === 'cm') return { v: n < 1000 ? Math.round(n*10) : Math.round(n), amb: false };
+  if(/\./.test(String(v))) return { v: Math.round(n*10), amb: false }; // 138.3 → 1383
+  if(n >= 1000)   return { v: Math.round(n),    amb: false };
+  if(n >= MM_MIN) return { v: Math.round(n),    amb: false };
+  return { v: Math.round(n*10), amb: n >= AMBIG_LO };
+}
+
+// 기존 호출부 호환용 (값만 필요할 때)
+function normalizeMm(v, mode){ return toMm(v, mode || 'auto').v; }
 
 /* ===================== 손글씨 인식 (서버 함수 → Gemini) ===================== */
 async function recognizeHandwriting(){
@@ -603,8 +684,16 @@ async function recognizeHandwriting(){
     sc.rows = parsed.rows.map(r=>{
       const box = (Array.isArray(r.box) && r.box.length===4 && r.box.every(n=>typeof n==='number')) ? r.box : null;
       const img = (typeof r.img==='number' && r.img>=0 && r.img<sc.images.length) ? r.img : 0;
-      const values = sc.floors.reduce((acc,f)=>{ const raw=(r.values && r.values[f]!=null) ? r.values[f] : ''; acc[f] = raw===''?'':normalizeMm(raw); return acc; }, {});
-      const row = { 구분: r.구분 ?? '', 번호: r.번호 ?? '', box, img, crop: '', values };
+      const values = {}, amb = {}, raws = {};
+      sc.floors.forEach(f=>{
+        const raw = (r.values && r.values[f]!=null) ? r.values[f] : '';
+        raws[f] = raw;              // 손글씨에 적힌 원문. 표기(cm/mm)를 바꿔도 여기서 다시 계산한다.
+        if(raw===''){ values[f]=''; return; }
+        const res = toMm(raw, sc.unit);
+        values[f] = res.v;
+        if(res.amb) amb[f] = true;  // cm/mm 판정이 갈리는 값 → 표에서 확인 요청
+      });
+      const row = { 구분: r.구분 ?? '', 번호: r.번호 ?? '', box, img, crop: '', values, amb, raw: raws };
       // 인식 직후 값을 따로 보관해 둔다. 이후 사용자가 고친 칸을 표시하고,
       // 다시 인식할 때 수정본을 덮어쓰기 전에 경고하는 기준이 된다.
       row.orig = { 구분: row.구분, 번호: row.번호, values: Object.assign({}, values) };
@@ -612,7 +701,9 @@ async function recognizeHandwriting(){
     });
 
     statusEl.className='status ok';
-    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. '원본(대조)' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`;
+    const ambN = countAmbiguous(sc);
+    statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. '원본(대조)' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`
+      + (ambN ? ` ⚠ cm/mm 판정이 갈리는 칸이 ${ambN}개 있습니다(노란 칸) — 원본과 대조해 ⇅ 버튼으로 확인해 주세요.` : '');
     // 크롭 생성은 수 초 걸릴 수 있으므로 표를 먼저 그린다.
     // (예전에는 크롭이 끝날 때까지 이전 표가 남아 있어, 그 사이 입력한 수정이 엉뚱한 행에 들어갈 수 있었다)
     renderTable();
@@ -683,6 +774,14 @@ function isEdited(r, key, floor){
 }
 // 숫자로 읽히지 않는 값은 치수 집계에서 통째로 빠지므로 눈에 띄게 표시한다.
 function isBadNumber(v){ return v !== '' && v != null && isNaN(v); }
+// cm 표기인지 실제 mm인지 자동으로 확정하지 못한 칸 (사용자가 ⇅로 확인하면 해제된다)
+function isAmbiguous(r, floor){ return !!(r && r.amb && r.amb[floor]); }
+function countAmbiguous(scope){
+  const list = scope ? [scope] : staircases;
+  let n = 0;
+  list.forEach(sc=>sc.rows.forEach(r=>sc.floors.forEach(f=>{ if(isAmbiguous(r,f)) n++; })));
+  return n;
+}
 
 // scope를 주면 그 계단만, 없으면 전체 계단의 수정 칸 수를 센다.
 function countEdits(scope){
@@ -708,24 +807,41 @@ function refreshCellState(inp){
   const val = f ? r.values[f] : r[key];
   const edited = f ? isEdited(r, null, f) : isEdited(r, key);
   const bad = f ? isBadNumber(val) : false;
+  const amb = f ? isAmbiguous(r, f) : false;
   const td = inp.parentElement;
   td.classList.toggle('edited', edited);
   td.classList.toggle('badcell', bad);
-  if(edited){
-    const o = origOf(r, key, f);
-    td.title = '인식값: ' + (o === '' || o == null ? '(빈칸)' : o) + ' → 수정 반영됨';
-  }else if(bad){
-    td.title = '숫자로 읽을 수 없어 치수 집계에서 제외됩니다.';
-  }else{
-    td.removeAttribute('title');
+  td.classList.toggle('ambig', amb && !bad);
+  td.title = cellTitle(r, key, f, val, edited, bad, amb);
+  if(!td.title) td.removeAttribute('title');
+}
+
+// 셀에 붙일 설명. 급한 것부터: 숫자 아님 > 단위 확인 필요 > 직접 수정함
+function cellTitle(r, key, floor, val, edited, bad, amb){
+  if(bad) return '숫자로 읽을 수 없어 치수 집계에서 제외됩니다.';
+  if(amb){
+    const half = Math.round((parseNum(val)||0)/10);
+    return '기록지에 세 자리로 적혀 있어 cm 표기인지 실제 mm인지 확정할 수 없습니다.\n'
+      + '지금은 cm 표기로 보고 ' + val + 'mm로 계산했습니다. 실제 ' + half + 'mm였다면 ⇅ 버튼을 눌러 바꿔주세요.';
   }
+  if(edited){
+    const o = origOf(r, key, floor);
+    return '인식값: ' + (o === '' || o == null ? '(빈칸)' : o) + ' → 수정 반영됨';
+  }
+  return '';
 }
 
 function refreshEditBadge(){
   const el = document.getElementById('editBadge');
-  if(!el) return;
-  const n = countEdits();
-  el.textContent = n ? '✎ 직접 수정한 ' + n + '칸이 반영되어 있습니다' : '';
+  if(el){
+    const n = countEdits();
+    el.textContent = n ? '✎ 직접 수정한 ' + n + '칸이 반영되어 있습니다' : '';
+  }
+  const ab = document.getElementById('ambigBadge');
+  if(ab){
+    const a = countAmbiguous();
+    ab.textContent = a ? '⚠ 단위 확인이 필요한 칸 ' + a + '개' : '';
+  }
 }
 
 // 포커스가 남아 있는 입력칸의 값을 확정시킨다(엑셀 생성 직전에 호출).
@@ -750,11 +866,9 @@ function renderTable(){
 
   const hasCrops = sc.rows.some(r=>r.crop);
   // 수정/오류 상태에 따라 <td>에 붙일 class·title 속성을 만든다.
-  const tdAttr = (edited, bad, origVal)=>{
-    const cls = (edited ? 'edited ' : '') + (bad ? 'badcell' : '');
+  const tdAttr = (cls, title)=>{
     let out = cls.trim() ? ` class="${cls.trim()}"` : '';
-    if(edited) out += ` title="${escAttr('인식값: ' + (origVal === '' || origVal == null ? '(빈칸)' : origVal) + ' → 수정 반영됨')}"`;
-    else if(bad) out += ' title="숫자로 읽을 수 없어 치수 집계에서 제외됩니다."';
+    if(title) out += ` title="${escAttr(title)}"`;
     return out;
   };
 
@@ -766,11 +880,18 @@ function renderTable(){
         ? `<td class="cropcell"><img src="${r.crop}" class="cropimg" alt="원본 조각" data-full="${r.crop}" title="클릭하면 크게 보기"></td>`
         : `<td class="cropcell"><span class="cropnone">—</span></td>`;
     }
-    cells += `<td${tdAttr(isEdited(r,'구분'), false, origOf(r,'구분'))}><input value="${escAttr(r.구분)}" data-ri="${ri}" data-field="구분"></td>`;
-    cells += `<td${tdAttr(isEdited(r,'번호'), false, origOf(r,'번호'))}><input value="${escAttr(r.번호)}" data-ri="${ri}" data-field="번호"></td>`;
+    ['구분','번호'].forEach(key=>{
+      const ed = isEdited(r, key);
+      cells += `<td${tdAttr(ed ? 'edited' : '', cellTitle(r, key, null, r[key], ed, false, false))}><input value="${escAttr(r[key])}" data-ri="${ri}" data-field="${key}"></td>`;
+    });
     sc.floors.forEach(f=>{
       const v = r.values[f] ?? '';
-      cells += `<td${tdAttr(isEdited(r,null,f), isBadNumber(v), origOf(r,null,f))}><input value="${escAttr(v)}" data-ri="${ri}" data-floor="${escAttr(f)}"></td>`;
+      const ed = isEdited(r, null, f), bad = isBadNumber(v), amb = isAmbiguous(r, f) && !bad;
+      const cls = 'numcell ' + (ed ? 'edited ' : '') + (bad ? 'badcell ' : '') + (amb ? 'ambig' : '');
+      cells += `<td${tdAttr(cls, cellTitle(r, null, f, v, ed, bad, amb))}>`
+        + `<input value="${escAttr(v)}" data-ri="${ri}" data-floor="${escAttr(f)}">`
+        + `<button class="unittoggle" data-ri="${ri}" data-floor="${escAttr(f)}" title="cm ↔ mm 전환 (×10 / ÷10)" tabindex="-1">⇅</button>`
+        + `</td>`;
     });
     cells += `<td class="rowdel" data-ri="${ri}">×</td>`;
     return `<tr>${cells}</tr>`;
@@ -781,7 +902,8 @@ function renderTable(){
     <div class="tablefoot">
       <button class="ghost" id="addRow">+ 행 추가</button>
       <span class="editbadge" id="editBadge"></span>
-      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'} 고친 값은 <b>따로 저장 버튼 없이 바로 반영</b>되고 주황색으로 표시됩니다. 값은 실제 mm입니다(현장 표기 152·138.3 → 1520·1383 자동 변환).</span>
+      <span class="ambigbadge" id="ambigBadge"></span>
+      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'} 고친 값은 <b>따로 저장 버튼 없이 바로 반영</b>되고 주황색으로 표시됩니다. 표의 값은 모두 실제 mm이며, cm 축약 표기(152 → 1520)는 자동 변환됩니다. <b class="ambigbadge">노란 칸</b>은 cm인지 mm인지 확정할 수 없는 값이니 원본과 대조한 뒤 ⇅ 버튼으로 확인해 주세요.</span>
     </div>
   `;
 
@@ -817,11 +939,39 @@ function renderTable(){
     inp.addEventListener('change', (e)=>{
       const ri = +e.target.dataset.ri;
       const f = e.target.dataset.floor;
+      const r = sc.rows[ri];
       const raw = e.target.value.trim();
-      const val = raw==='' ? '' : normalizeMm(raw);
-      sc.rows[ri].values[f] = val;
-      e.target.value = val;   // 변환 결과를 화면에도 그대로 보여준다
+      r.amb = r.amb || {};
+      if(raw === ''){
+        r.values[f] = '';
+        delete r.amb[f];
+      }else{
+        const res = toMm(raw, sc.unit);
+        r.values[f] = res.v;
+        if(res.amb) r.amb[f] = true; else delete r.amb[f];
+        e.target.value = res.v;   // 변환 결과를 화면에도 그대로 보여준다
+      }
       refreshCellState(e.target);
+      refreshEditBadge();
+      renderSummary();
+    });
+  });
+
+  // ⇅ : 이 칸만 cm↔mm 를 뒤집는다(×10 / ÷10). 누르면 '확인 필요' 표시도 해제된다.
+  area.querySelectorAll('.unittoggle').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const ri = +btn.dataset.ri;
+      const f = btn.dataset.floor;
+      const r = sc.rows[ri];
+      const n = parseNum(r.values[f]);
+      if(n === null) return;   // 숫자가 아니면 뒤집을 것이 없다
+      r.values[f] = n >= 1000 ? Math.round(n/10) : Math.round(n*10);
+      r.amb = r.amb || {};
+      delete r.amb[f];         // 사람이 직접 확인한 값이므로 더 묻지 않는다
+      const inp = btn.parentElement.querySelector('input');
+      if(inp) inp.value = r.values[f];
+      if(inp) refreshCellState(inp);
       refreshEditBadge();
       renderSummary();
     });
@@ -991,10 +1141,13 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
     let badN = 0;
     staircases.forEach(sc=>sc.rows.forEach(r=>sc.floors.forEach(f=>{ if(isBadNumber(r.values[f])) badN++; })));
 
-    statusEl.className = badN ? 'status error' : 'status ok';
+    const ambN = countAmbiguous();
+
+    statusEl.className = (badN || ambN) ? 'status error' : 'status ok';
     statusEl.textContent = '엑셀 파일이 다운로드되었습니다.'
       + (editN ? ' 직접 수정한 ' + editN + '칸이 그대로 반영되었습니다.' : '')
       + (badN ? ' ⚠ 숫자로 읽을 수 없는 칸이 ' + badN + '개 있어 치수 집계에서 빠졌습니다(표에서 빨간 칸을 확인해주세요).' : '')
+      + (ambN ? ' ⚠ cm/mm 판정이 갈리는 칸 ' + ambN + '개는 cm 표기로 계산했습니다(표에서 노란 칸을 확인해주세요).' : '')
       + ' "개요 기록값(m)" 칸은 시공 개요서 수치를 직접 입력해 대조해보세요.';
   }catch(err){
     statusEl.className='status error';

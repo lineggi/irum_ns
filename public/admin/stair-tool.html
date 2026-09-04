@@ -190,6 +190,13 @@
   table.datatable td input:focus{background:#EAF1F6;}
   table.datatable tr:nth-child(even) td{background:#FBFAF7;}
   .rowdel{cursor:pointer; color:var(--red); font-weight:700; user-select:none;}
+  /* 인식값을 직접 고친 셀 — 반영됐다는 걸 눈으로 확인할 수 있게 표시한다 */
+  table.datatable td.edited{background:#FDF3E3 !important; box-shadow:inset 0 0 0 1.5px var(--rust);}
+  table.datatable td.edited input{font-weight:700; color:var(--rust);}
+  /* 숫자로 읽을 수 없어 집계에서 빠지는 셀 */
+  table.datatable td.badcell{background:#FAE9E7 !important; box-shadow:inset 0 0 0 1.5px var(--red);}
+  table.datatable td.badcell input{color:var(--red); font-weight:700;}
+  .editbadge{font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:var(--rust);}
   .tablefoot{display:flex; justify-content:space-between; align-items:center; margin-top:12px;}
 
   .summarybox{
@@ -496,7 +503,8 @@ async function handleImageUpload(e){
 function escAttr(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function normalizeMm(v){
   if(v==null || v==='') return '';
-  const n = parseFloat(String(v).replace(/[^0-9.\-]/g,''));
+  // 천단위 쉼표를 먼저 없앤다. 그냥 두면 '1,520' → '1.520' → 1.52 로 읽혀 15가 되어버린다.
+  const n = parseFloat(String(v).replace(/,/g,'').replace(/[^0-9.\-]/g,''));
   if(isNaN(n)) return (typeof v==='string' ? v : '');
   return n < 1000 ? Math.round(n*10) : Math.round(n);
 }
@@ -509,6 +517,16 @@ async function recognizeHandwriting(){
     statusEl.className='status error';
     statusEl.textContent='먼저 사진을 업로드해주세요.';
     return;
+  }
+  // 다시 인식하면 표가 통째로 새 결과로 바뀐다. 직접 고친 칸이 있으면 먼저 물어본다.
+  const pendingEdits = countEdits(sc);
+  if(pendingEdits > 0){
+    const ok = confirm('이 계단에서 직접 수정한 ' + pendingEdits + '칸이 있습니다.\n\n다시 인식하면 수정한 내용이 모두 사라지고 새 인식 결과로 덮어씁니다.\n계속할까요?');
+    if(!ok){
+      statusEl.className='status';
+      statusEl.textContent='재인식을 취소했습니다. 수정한 내용은 그대로 유지됩니다.';
+      return;
+    }
   }
   statusEl.className='status loading';
   statusEl.textContent='인식 중입니다... (보통 10~40초)';
@@ -585,16 +603,20 @@ async function recognizeHandwriting(){
     sc.rows = parsed.rows.map(r=>{
       const box = (Array.isArray(r.box) && r.box.length===4 && r.box.every(n=>typeof n==='number')) ? r.box : null;
       const img = (typeof r.img==='number' && r.img>=0 && r.img<sc.images.length) ? r.img : 0;
-      return {
-        구분: r.구분 ?? '',
-        번호: r.번호 ?? '',
-        box, img, crop: '',
-        values: sc.floors.reduce((acc,f)=>{ const raw=(r.values && r.values[f]!=null) ? r.values[f] : ''; acc[f] = raw===''?'':normalizeMm(raw); return acc; }, {})
-      };
+      const values = sc.floors.reduce((acc,f)=>{ const raw=(r.values && r.values[f]!=null) ? r.values[f] : ''; acc[f] = raw===''?'':normalizeMm(raw); return acc; }, {});
+      const row = { 구분: r.구분 ?? '', 번호: r.번호 ?? '', box, img, crop: '', values };
+      // 인식 직후 값을 따로 보관해 둔다. 이후 사용자가 고친 칸을 표시하고,
+      // 다시 인식할 때 수정본을 덮어쓰기 전에 경고하는 기준이 된다.
+      row.orig = { 구분: row.구분, 번호: row.번호, values: Object.assign({}, values) };
+      return row;
     });
 
     statusEl.className='status ok';
     statusEl.textContent = `인식 완료: ${sc.rows.length}행 추출됨. '원본(대조)' 열의 잘린 사진과 인식값을 대조해 수정한 뒤 엑셀로 내려받으세요.`;
+    // 크롭 생성은 수 초 걸릴 수 있으므로 표를 먼저 그린다.
+    // (예전에는 크롭이 끝날 때까지 이전 표가 남아 있어, 그 사이 입력한 수정이 엉뚱한 행에 들어갈 수 있었다)
+    renderTable();
+    renderSummary();
     await buildCrops(sc);   // 원본 대조용 이미지 크롭 생성
     renderTable();
     renderSummary();
@@ -646,6 +668,72 @@ async function buildCrops(sc){
   }catch(e){ /* 크롭 실패해도 표는 정상 동작 */ }
 }
 
+/* ===================== 수정 반영 상태 ===================== */
+// 인식 직후 값(row.orig)과 지금 값을 비교해 "사용자가 직접 고친 칸"을 판별한다.
+// 표에서는 주황색으로 강조하고, 개수를 표 아래·엑셀 안내문에 함께 보여준다.
+function origOf(r, key, floor){
+  if(!r || !r.orig) return undefined;
+  return floor ? (r.orig.values ? r.orig.values[floor] : undefined) : r.orig[key];
+}
+function isEdited(r, key, floor){
+  const o = origOf(r, key, floor);
+  if(o === undefined) return false;
+  const cur = floor ? (r.values ? r.values[floor] : '') : r[key];
+  return String(o ?? '') !== String(cur ?? '');
+}
+// 숫자로 읽히지 않는 값은 치수 집계에서 통째로 빠지므로 눈에 띄게 표시한다.
+function isBadNumber(v){ return v !== '' && v != null && isNaN(v); }
+
+// scope를 주면 그 계단만, 없으면 전체 계단의 수정 칸 수를 센다.
+function countEdits(scope){
+  const list = scope ? [scope] : staircases;
+  let n = 0;
+  list.forEach(sc=>{
+    sc.rows.forEach(r=>{
+      if(isEdited(r, '구분')) n++;
+      if(isEdited(r, '번호')) n++;
+      sc.floors.forEach(f=>{ if(isEdited(r, null, f)) n++; });
+    });
+  });
+  return n;
+}
+
+// 셀 하나의 강조 상태만 갱신한다(표 전체를 다시 그리지 않아 입력 중 포커스가 유지된다).
+function refreshCellState(inp){
+  const sc = getActive();
+  const r = sc.rows[+inp.dataset.ri];
+  if(!r) return;
+  const f = inp.dataset.floor;
+  const key = inp.dataset.field;
+  const val = f ? r.values[f] : r[key];
+  const edited = f ? isEdited(r, null, f) : isEdited(r, key);
+  const bad = f ? isBadNumber(val) : false;
+  const td = inp.parentElement;
+  td.classList.toggle('edited', edited);
+  td.classList.toggle('badcell', bad);
+  if(edited){
+    const o = origOf(r, key, f);
+    td.title = '인식값: ' + (o === '' || o == null ? '(빈칸)' : o) + ' → 수정 반영됨';
+  }else if(bad){
+    td.title = '숫자로 읽을 수 없어 치수 집계에서 제외됩니다.';
+  }else{
+    td.removeAttribute('title');
+  }
+}
+
+function refreshEditBadge(){
+  const el = document.getElementById('editBadge');
+  if(!el) return;
+  const n = countEdits();
+  el.textContent = n ? '✎ 직접 수정한 ' + n + '칸이 반영되어 있습니다' : '';
+}
+
+// 포커스가 남아 있는 입력칸의 값을 확정시킨다(엑셀 생성 직전에 호출).
+function commitActiveInput(){
+  const el = document.activeElement;
+  if(el && el.tagName === 'INPUT' && (el.dataset.floor || el.dataset.field)) el.blur();
+}
+
 /* ===================== 렌더: 데이터 표 ===================== */
 function renderTable(){
   const sc = getActive();
@@ -661,6 +749,15 @@ function renderTable(){
   }
 
   const hasCrops = sc.rows.some(r=>r.crop);
+  // 수정/오류 상태에 따라 <td>에 붙일 class·title 속성을 만든다.
+  const tdAttr = (edited, bad, origVal)=>{
+    const cls = (edited ? 'edited ' : '') + (bad ? 'badcell' : '');
+    let out = cls.trim() ? ` class="${cls.trim()}"` : '';
+    if(edited) out += ` title="${escAttr('인식값: ' + (origVal === '' || origVal == null ? '(빈칸)' : origVal) + ' → 수정 반영됨')}"`;
+    else if(bad) out += ' title="숫자로 읽을 수 없어 치수 집계에서 제외됩니다."';
+    return out;
+  };
+
   let thead = '<tr>' + (hasCrops ? '<th>원본(대조)</th>' : '') + '<th>구분</th><th>번호</th>' + sc.floors.map(f=>`<th>${escAttr(f)}</th>`).join('') + '<th></th></tr>';
   let tbody = sc.rows.map((r,ri)=>{
     let cells = '';
@@ -669,10 +766,11 @@ function renderTable(){
         ? `<td class="cropcell"><img src="${r.crop}" class="cropimg" alt="원본 조각" data-full="${r.crop}" title="클릭하면 크게 보기"></td>`
         : `<td class="cropcell"><span class="cropnone">—</span></td>`;
     }
-    cells += `<td><input value="${escAttr(r.구분)}" data-ri="${ri}" data-field="구분"></td>`;
-    cells += `<td><input value="${escAttr(r.번호)}" data-ri="${ri}" data-field="번호"></td>`;
+    cells += `<td${tdAttr(isEdited(r,'구분'), false, origOf(r,'구분'))}><input value="${escAttr(r.구분)}" data-ri="${ri}" data-field="구분"></td>`;
+    cells += `<td${tdAttr(isEdited(r,'번호'), false, origOf(r,'번호'))}><input value="${escAttr(r.번호)}" data-ri="${ri}" data-field="번호"></td>`;
     sc.floors.forEach(f=>{
-      cells += `<td><input value="${escAttr(r.values[f] ?? '')}" data-ri="${ri}" data-floor="${escAttr(f)}"></td>`;
+      const v = r.values[f] ?? '';
+      cells += `<td${tdAttr(isEdited(r,null,f), isBadNumber(v), origOf(r,null,f))}><input value="${escAttr(v)}" data-ri="${ri}" data-floor="${escAttr(f)}"></td>`;
     });
     cells += `<td class="rowdel" data-ri="${ri}">×</td>`;
     return `<tr>${cells}</tr>`;
@@ -682,7 +780,8 @@ function renderTable(){
     <table class="datatable"><thead>${thead}</thead><tbody>${tbody}</tbody></table>
     <div class="tablefoot">
       <button class="ghost" id="addRow">+ 행 추가</button>
-      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'} 값은 실제 mm입니다(현장 표기 152·138.3 → 1520·1383 자동 변환).</span>
+      <span class="editbadge" id="editBadge"></span>
+      <span class="hint">${hasCrops ? "왼쪽 '원본' 조각과 인식값을 대조해 수정하세요. 조각을 클릭하면 크게 볼 수 있습니다." : '셀을 클릭해 직접 수정할 수 있습니다.'} 고친 값은 <b>따로 저장 버튼 없이 바로 반영</b>되고 주황색으로 표시됩니다. 값은 실제 mm입니다(현장 표기 152·138.3 → 1520·1383 자동 변환).</span>
     </div>
   `;
 
@@ -690,24 +789,44 @@ function renderTable(){
     img.addEventListener('click', ()=> openCropModal(img.dataset.full));
   });
 
+  // 구분·번호: 타이핑하는 즉시 모델에 반영
   area.querySelectorAll('input[data-field]').forEach(inp=>{
     inp.addEventListener('input', (e)=>{
       const ri = +e.target.dataset.ri;
       const field = e.target.dataset.field;
       sc.rows[ri][field] = e.target.value;
+      refreshCellState(e.target);
+      refreshEditBadge();
       if(field==='번호') return;
       renderSummary();
     });
   });
+
+  // 층 치수: 타이핑 중에는 값을 그대로 담아두고(입력 도중 값이 튀지 않게),
+  // 입력을 확정할 때(포커스 이동·엔터) 인식 경로와 똑같이 현장 표기 ×10 변환을 적용한다.
   area.querySelectorAll('input[data-floor]').forEach(inp=>{
     inp.addEventListener('input', (e)=>{
       const ri = +e.target.dataset.ri;
       const f = e.target.dataset.floor;
       const v = e.target.value.trim();
       sc.rows[ri].values[f] = v==='' ? '' : (isNaN(+v) ? v : +v);
+      refreshCellState(e.target);
+      refreshEditBadge();
+      renderSummary();
+    });
+    inp.addEventListener('change', (e)=>{
+      const ri = +e.target.dataset.ri;
+      const f = e.target.dataset.floor;
+      const raw = e.target.value.trim();
+      const val = raw==='' ? '' : normalizeMm(raw);
+      sc.rows[ri].values[f] = val;
+      e.target.value = val;   // 변환 결과를 화면에도 그대로 보여준다
+      refreshCellState(e.target);
+      refreshEditBadge();
       renderSummary();
     });
   });
+
   area.querySelectorAll('.rowdel').forEach(td=>{
     td.addEventListener('click', (e)=>{
       const ri = +e.target.dataset.ri;
@@ -719,6 +838,8 @@ function renderTable(){
     sc.rows.push({구분:'상', 번호: sc.rows.length+1, values: sc.floors.reduce((a,f)=>{a[f]='';return a;},{})});
     renderTable(); renderSummary();
   });
+
+  refreshEditBadge();
 }
 
 /* ===================== 치수별 개수 집계 ===================== */
@@ -795,6 +916,8 @@ function renderAll(){
 /* ===================== 엑셀 생성 ===================== */
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const statusEl = document.getElementById('exportStatus');
+  // 셀을 고치던 중(포커스가 남은 상태)에 바로 버튼을 눌러도 마지막 수정까지 확정되게 한다.
+  commitActiveInput();
   try{
     const wb = XLSX.utils.book_new();
 
@@ -863,8 +986,16 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
     const safeName = (meta.장소 || '계단실측').replace(/[\\/:*?"<>|]/g,'_').trim() || '계단실측';
     XLSX.writeFile(wb, safeName + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
 
-    statusEl.className='status ok';
-    statusEl.textContent = '엑셀 파일이 다운로드되었습니다. "개요 기록값(m)" 칸은 시공 개요서 수치를 직접 입력해 대조해보세요.';
+    // 사용자가 직접 고친 칸과, 숫자가 아니라 집계에서 빠진 칸을 결과 안내에 함께 알려준다.
+    const editN = countEdits();
+    let badN = 0;
+    staircases.forEach(sc=>sc.rows.forEach(r=>sc.floors.forEach(f=>{ if(isBadNumber(r.values[f])) badN++; })));
+
+    statusEl.className = badN ? 'status error' : 'status ok';
+    statusEl.textContent = '엑셀 파일이 다운로드되었습니다.'
+      + (editN ? ' 직접 수정한 ' + editN + '칸이 그대로 반영되었습니다.' : '')
+      + (badN ? ' ⚠ 숫자로 읽을 수 없는 칸이 ' + badN + '개 있어 치수 집계에서 빠졌습니다(표에서 빨간 칸을 확인해주세요).' : '')
+      + ' "개요 기록값(m)" 칸은 시공 개요서 수치를 직접 입력해 대조해보세요.';
   }catch(err){
     statusEl.className='status error';
     statusEl.textContent = '생성 실패: ' + err.message;
